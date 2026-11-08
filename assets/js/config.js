@@ -34,8 +34,6 @@ const CONFIG = {
 
   // 4. Danh sách ảnh chân dung cử nhân (Hỗ trợ nhiều ảnh, có nút lật & tự động trượt)
   photos: [
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop"
   ],
 

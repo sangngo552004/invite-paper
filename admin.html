@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Studio - Chỉnh Sửa Thiệp & Quản Lý Khách Mời 🎓</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
@@ -23,7 +26,12 @@
       --border: #DCE8E0;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg-sage);
@@ -107,8 +115,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Studio Grid */
@@ -164,7 +179,9 @@
     }
 
     @media (max-width: 600px) {
-      .grid-2 { grid-template-columns: 1fr; }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
     }
 
     label {
@@ -175,7 +192,9 @@
       color: var(--text);
     }
 
-    input, textarea, select {
+    input,
+    textarea,
+    select {
       width: 100%;
       padding: 10px 12px;
       border: 1.5px solid var(--border);
@@ -187,7 +206,8 @@
       transition: all 0.2s ease;
     }
 
-    input:focus, textarea:focus {
+    input:focus,
+    textarea:focus {
       outline: none;
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(85, 122, 102, 0.15);
@@ -324,7 +344,7 @@
       background: #FFFFFF;
       border: 10px solid #2C3831;
       border-radius: 36px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.16);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -360,7 +380,8 @@
       font-size: 0.9rem;
     }
 
-    th, td {
+    th,
+    td {
       padding: 10px 12px;
       border-bottom: 1px solid var(--border);
     }
@@ -396,7 +417,7 @@
       border-radius: 20px;
       font-size: 0.9rem;
       font-weight: 500;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
       transition: all 0.3s ease;
       opacity: 0;
       z-index: 9999;
@@ -408,14 +429,15 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
-    
+
     <!-- Top Action Bar -->
     <header class="top-action-bar">
       <div class="top-bar-title">Thiệp Tốt Nghiệp 🎓</div>
-      
+
       <!-- 2 Tabs điều hướng -->
       <nav class="nav-tabs">
         <button id="btnTabEditor" class="nav-tab-btn active" data-tab="tab-editor">
@@ -437,7 +459,7 @@
          ========================================================================== -->
     <section id="tab-editor" class="tab-pane active">
       <div class="studio-grid">
-        
+
         <!-- Cột Form Chỉnh Sửa -->
         <div class="editor-col">
 
@@ -519,15 +541,17 @@
               </div>
               <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
             </div>
-            
+
             <p class="hint-text" style="margin-bottom: 12px;">
-              💡 <strong>Thêm bao nhiêu ảnh tùy thích:</strong> Dán link ảnh hoặc link Google Drive (chia sẻ "Bất kỳ ai có liên kết"). Nếu có từ 2 ảnh trở lên, thiệp sẽ tự động hiện 2 nút lật ảnh và chuyển ảnh mượt mà!
+              💡 <strong>Thêm bao nhiêu ảnh tùy thích:</strong> Dán link ảnh hoặc link Google Drive (chia sẻ "Bất kỳ ai
+              có liên kết"). Nếu có từ 2 ảnh trở lên, thiệp sẽ tự động hiện 2 nút lật ảnh và chuyển ảnh mượt mà!
             </p>
 
             <!-- Danh sách các ô ảnh động -->
             <div id="photoSlotsContainer"></div>
 
-            <button type="button" id="btnAddPhotoSlot" class="btn btn-secondary btn-sm" style="margin-top: 6px; width: 100%;">
+            <button type="button" id="btnAddPhotoSlot" class="btn btn-secondary btn-sm"
+              style="margin-top: 6px; width: 100%;">
               ➕ Thêm Ảnh Khác
             </button>
           </div>
@@ -583,13 +607,20 @@
               <div class="phone-mockup-header">
                 <span>📱 Xem Trước Thiệp</span>
                 <div style="display: flex; gap: 6px; align-items: center;">
-                  <button id="btnViewCard" title="Xem nội dung thiệp" style="background:#557A66; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">📜 Xem Thiệp</button>
-                  <button id="btnViewEnvelope" title="Xem phong bì" style="background:#444; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">✉️ Phong Bì</button>
-                  <button id="btnRefreshPreview" title="Tải lại preview" style="background:none; border:none; color:#FFF; cursor:pointer; font-size:0.9rem;">🔄</button>
-                  <a href="index.html?to=Xem+Trước&id=demo&preview=true" target="_blank" title="Mở tab mới đầy đủ" style="color:#FFF; text-decoration:none; font-size:0.9rem;">↗️</a>
+                  <button id="btnViewCard" title="Xem nội dung thiệp"
+                    style="background:#557A66; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">📜
+                    Xem Thiệp</button>
+                  <button id="btnViewEnvelope" title="Xem phong bì"
+                    style="background:#444; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">✉️
+                    Phong Bì</button>
+                  <button id="btnRefreshPreview" title="Tải lại preview"
+                    style="background:none; border:none; color:#FFF; cursor:pointer; font-size:0.9rem;">🔄</button>
+                  <a href="index.html?to=Xem+Trước&id=demo&preview=true" target="_blank" title="Mở tab mới đầy đủ"
+                    style="color:#FFF; text-decoration:none; font-size:0.9rem;">↗️</a>
                 </div>
               </div>
-              <iframe id="previewIframe" class="phone-mockup-iframe" src="index.html?to=Xem+Trước&id=demo&preview=true"></iframe>
+              <iframe id="previewIframe" class="phone-mockup-iframe"
+                src="index.html?to=Xem+Trước&id=demo&preview=true"></iframe>
             </div>
           </div>
         </div>
@@ -608,8 +639,10 @@
 
         <p class="hint-text" style="margin-bottom: 12px;">
           Gõ tên bạn bè (mỗi người 1 dòng).<br>
-          💡 <strong>Mẹo chia giờ riêng:</strong> Gõ thêm dấu gạch đứng <code>|</code> kèm giờ, ví dụ: <code>Anh Tuấn | 09:00</code>.<br>
-          🔒 <strong>Bảo mật:</strong> Chỉ những người <strong>thật sự có trong danh sách bên dưới</strong> mới mở được thiệp! Bất kỳ ai tự gõ tên lạ vào đường dẫn đều sẽ bị chặn thông báo link không hợp lệ.
+          💡 <strong>Mẹo chia giờ riêng:</strong> Gõ thêm dấu gạch đứng <code>|</code> kèm giờ, ví dụ:
+          <code>Anh Tuấn | 09:00</code>.<br>
+          🔒 <strong>Bảo mật:</strong> Chỉ những người <strong>thật sự có trong danh sách bên dưới</strong> mới mở được
+          thiệp! Bất kỳ ai tự gõ tên lạ vào đường dẫn đều sẽ bị chặn thông báo link không hợp lệ.
         </p>
 
         <div class="form-group">
@@ -641,7 +674,9 @@ Hoàng Long"></textarea>
           <div class="card-title">
             <span>📋 Danh Sách Khách Mời Hợp Lệ (<span id="totalCount">0</span> người)</span>
           </div>
-          <span id="copiedCountBadge" style="font-size:0.82rem; color:var(--primary); font-weight:600; background:var(--primary-subtle); padding:4px 10px; border-radius:12px;">Đã copy: 0/0</span>
+          <span id="copiedCountBadge"
+            style="font-size:0.82rem; color:var(--primary); font-weight:600; background:var(--primary-subtle); padding:4px 10px; border-radius:12px;">Đã
+            copy: 0/0</span>
         </div>
 
         <div class="table-wrap">
@@ -662,6 +697,28 @@ Hoàng Long"></textarea>
       </div>
     </section>
 
+  </div>
+
+  <!-- Modal Hướng Dẫn Cập Nhật Apps Script (khi phát hiện bản cũ) -->
+  <div id="modalOldVersion" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:#FFF; max-width:540px; width:100%; border-radius:20px; padding:24px; box-shadow:0 20px 40px rgba(0,0,0,0.2); animation:fadeIn 0.3s ease;">
+      <div style="font-size:1.8rem; margin-bottom:8px;">⚠️</div>
+      <h3 style="font-size:1.2rem; color:#2C3831; margin-bottom:10px;">Cần Cập Nhật Phiên Bản Mới Trên Google Apps Script!</h3>
+      <p style="font-size:0.9rem; color:#555; line-height:1.5; margin-bottom:14px;">
+        Thông tin của bạn đã được <strong>lưu trên máy này</strong>, nhưng <strong>chưa được lưu vào Google Sheets</strong> vì file Apps Script trên Google của bạn đang chạy phiên bản cũ (chưa kích hoạt hàm lưu cấu hình).
+      </p>
+      <div style="background:#F2F6F3; border:1px solid #DCE8E0; border-radius:12px; padding:14px; font-size:0.88rem; color:#2C3831; margin-bottom:16px; line-height:1.6;">
+        <strong style="color:#557A66;">👉 3 bước cực nhanh để Google Sheets tự động nhận:</strong>
+        <ol style="margin-left:20px; margin-top:6px;">
+          <li>Mở dự án Google Apps Script của bạn (nơi bạn dán code).</li>
+          <li>Copy toàn bộ mã trong file <code>google-apps-script.js</code> dán đè vào và bấm <b>Ctrl + S</b>.</li>
+          <li>Bấm nút xanh <b>Triển khai (Deploy) ➔ Quản lý bản triển khai (Manage deployments) ➔ Sửa (icon cây bút) ➔ Mục Phiên bản chọn "Phiên bản mới" (New version) ➔ Bấm Triển khai</b>.</li>
+        </ol>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" id="btnCloseOldVersionModal" class="btn btn-primary" style="padding:8px 20px;">Đã hiểu, tôi sẽ cập nhật ngay!</button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Thông Báo -->
@@ -804,7 +861,7 @@ Hoàng Long"></textarea>
       try {
         const saved = localStorage.getItem("invitation_admin_config");
         if (saved) cfg = Object.assign({}, CONFIG, JSON.parse(saved));
-      } catch (e) {}
+      } catch (e) { }
 
       document.getElementById("editFullName").value = cfg.graduate.fullName || "";
       document.getElementById("editDegree").value = cfg.graduate.degreeTitle || "";
@@ -818,7 +875,7 @@ Hoàng Long"></textarea>
       document.getElementById("editMapsUrl").value = cfg.ceremony.googleMapsUrl || "";
 
       const ceremonyDateInput = document.getElementById("editCeremonyDate");
-      ceremonyDateInput.addEventListener("change", function() {
+      ceremonyDateInput.addEventListener("change", function () {
         if (this.value) {
           document.getElementById("editDateFormatted").value = formatDisplayDate(this.value);
           broadcastConfigToPreview();
@@ -973,11 +1030,11 @@ Hoàng Long"></textarea>
         const json = await res.json();
         if (json.status === "success" && json.data) {
           const remote = json.data;
-          
+
           if (remote.graduate_name) document.getElementById("editFullName").value = remote.graduate_name;
           if (remote.degree_title) document.getElementById("editDegree").value = remote.degree_title;
           if (remote.university) document.getElementById("editUniversity").value = remote.university;
-          if (remote.time) document.getElementById("editCeremonyTime").value = remote.time;
+          if (remote.time || remote.ceremony_time) document.getElementById("editCeremonyTime").value = remote.time || remote.ceremony_time;
           if (remote.ceremony_date) document.getElementById("editCeremonyDate").value = remote.ceremony_date.slice(0, 16);
           if (remote.date_formatted) document.getElementById("editDateFormatted").value = formatDisplayDate(remote.date_formatted);
           if (remote.venue_name) document.getElementById("editVenueName").value = remote.venue_name;
@@ -990,26 +1047,26 @@ Hoàng Long"></textarea>
             const audioPreview = document.getElementById("adminAudioPreview");
             if (audioPreview) audioPreview.src = normalizeDriveUrl(remote.music_url);
           }
-          let localDraftPhotos = [];
-          try {
-            const saved = localStorage.getItem("invitation_admin_config");
-            if (saved) {
-              const parsed = JSON.parse(saved);
-              if (parsed.photos && parsed.photos.length) localDraftPhotos = parsed.photos;
-            }
-          } catch(e) {}
 
+          // XỬ LÝ ẢNH CHÍNH XÁC: Hiển thị đúng số lượng ảnh trên Google Sheet (kể cả 1 ảnh)
           let remotePhotosList = [];
           if (remote.photo_urls) {
             remotePhotosList = remote.photo_urls.split(",").map(u => u.trim()).filter(Boolean);
           }
 
-          // Bảo vệ ảnh: Ưu tiên tuyệt đối danh sách ảnh người dùng đã lưu trên máy (ví dụ 5 ảnh), không để Sheet cũ đè mất!
-          let finalPhotos = (localDraftPhotos && localDraftPhotos.length > 0)
-            ? localDraftPhotos
-            : (remotePhotosList.length > 1 ? remotePhotosList : CONFIG.photos);
-
-          renderDynamicPhotoSlots(finalPhotos);
+          if (remotePhotosList.length > 0) {
+            renderDynamicPhotoSlots(remotePhotosList);
+          } else {
+            let localDraftPhotos = [];
+            try {
+              const saved = localStorage.getItem("invitation_admin_config");
+              if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.photos && parsed.photos.length) localDraftPhotos = parsed.photos;
+              }
+            } catch (e) { }
+            renderDynamicPhotoSlots(localDraftPhotos.length ? localDraftPhotos : CONFIG.photos);
+          }
 
           // Lưu đệm vào localStorage hiện tại
           localStorage.setItem("invitation_admin_config", JSON.stringify(collectFormConfig()));
@@ -1032,7 +1089,7 @@ Hoàng Long"></textarea>
                   renderGuestsTableGlobal();
                 }
               }
-            } catch(e) {
+            } catch (e) {
               console.warn("Lỗi đọc danh sách khách từ Sheets:", e);
             }
           }
@@ -1046,22 +1103,79 @@ Hoàng Long"></textarea>
     }
 
     /**
+     * Gửi lưu cấu hình lên Google Sheets (Thử POST trước, fallback GET)
+     */
+    async function sendSaveToGoogleSheets(scriptUrl, configData) {
+      if (!scriptUrl) return { success: false, message: "Chưa cấu hình URL Google Sheets" };
+
+      // 1. Thử gửi POST text/plain
+      try {
+        const payload = {
+          action: "saveConfig",
+          config: configData
+        };
+        const res = await fetch(scriptUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        if (json && json.status === "success" && json.message && json.message.includes("cấu hình")) {
+          return { success: true, message: json.message };
+        }
+        // Nhận diện script cũ trên Google Sheet trả về RSVP
+        if (json && json.message && (json.message.includes("tham gia") || json.message.includes("lời chúc"))) {
+          return {
+            success: false,
+            isOldVersion: true,
+            message: "Google Apps Script đang chạy phiên bản cũ."
+          };
+        }
+      } catch (errPost) {
+        console.warn("POST saveConfig gặp sự cố, chuyển sang thử GET fallback:", errPost);
+      }
+
+      // 2. Thử gửi GET fallback
+      try {
+        const getUrl = `${scriptUrl}?action=saveConfig&payload=${encodeURIComponent(JSON.stringify(configData))}&t=${Date.now()}`;
+        const resGet = await fetch(getUrl);
+        const jsonGet = await resGet.json();
+        if (jsonGet && jsonGet.status === "success" && jsonGet.message && jsonGet.message.includes("cấu hình")) {
+          return { success: true, message: jsonGet.message };
+        }
+        if (jsonGet && jsonGet.message && jsonGet.message.includes("hoạt động bình thường")) {
+          return {
+            success: false,
+            isOldVersion: true,
+            message: "Google Apps Script chưa nhận diện được lệnh saveConfig."
+          };
+        }
+      } catch (errGet) {
+        console.warn("GET saveConfig cũng gặp lỗi:", errGet);
+      }
+
+      // 3. Fallback no-cors mù (vẫn gửi gói tin đi)
+      try {
+        await fetch(scriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ action: "saveConfig", config: configData })
+        });
+        return { success: true, isBlind: true, message: "Đã gửi lên Google Sheets." };
+      } catch (e) {
+        return { success: false, message: e.toString() };
+      }
+    }
+
+    /**
      * Tự động đồng bộ riêng danh sách khách lên Google Sheets
      */
     async function syncGuestsToSheet() {
       if (!CONFIG.googleSheetScriptUrl) return;
       try {
-        const payload = {
-          action: "saveConfig",
-          config: {
-            guests_json: JSON.stringify(currentGuestList || [])
-          }
-        };
-        await fetch(CONFIG.googleSheetScriptUrl, {
-          method: "POST",
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
+        await sendSaveToGoogleSheets(CONFIG.googleSheetScriptUrl, {
+          guests_json: JSON.stringify(currentGuestList || [])
         });
       } catch (e) {
         console.warn("Lỗi đồng bộ danh sách khách lên Sheets:", e);
@@ -1069,54 +1183,66 @@ Hoàng Long"></textarea>
     }
 
     /**
-     * Nút Lưu Duy Nhất (Vừa lưu máy, vừa tự đồng bộ Google Sheets)
+     * Nút Lưu Duy Nhất (Mặc định lưu thẳng vào Google Sheets + đồng bộ localStorage)
      */
     async function handleMasterSave() {
       const newCfg = collectFormConfig();
 
-      // 1. Lưu vào localStorage để web áp dụng ngay lập tức
-      localStorage.setItem("invitation_admin_config", JSON.stringify(newCfg));
+      // Cập nhật ngay màn hình Live Preview
       broadcastConfigToPreview();
-      refreshPreview();
 
-      showToast("⏳ Đang lưu và đồng bộ Google Sheets...");
+      showToast("⏳ Đang lưu trực tiếp vào Google Sheets...");
 
-      // 2. Tự động gửi đồng bộ thẳng vào file Google Sheets (kèm danh sách khách mời)
+      const savePayload = {
+        graduate_name: newCfg.graduate.fullName,
+        degree_title: newCfg.graduate.degreeTitle,
+        university: newCfg.graduate.university,
+        ceremony_date: newCfg.ceremony.dateTime,
+        time: newCfg.ceremony.time,
+        ceremony_time: newCfg.ceremony.time,
+        date_formatted: newCfg.ceremony.dateFormatted,
+        venue_name: newCfg.ceremony.venueName,
+        address: newCfg.ceremony.address,
+        maps_url: newCfg.ceremony.googleMapsUrl,
+        contact_phone: newCfg.contact.phone,
+        contact_person: newCfg.contact.personName,
+        music_url: newCfg.audio.url,
+        photo_urls: newCfg.photos.join(","),
+        guests_json: JSON.stringify(currentGuestList || [])
+      };
+
+      // 1. Lưu vào localStorage để không bị mất dữ liệu
+      localStorage.setItem("invitation_admin_config", JSON.stringify(newCfg));
+
+      // 2. Gửi lưu lên Google Sheets
       if (newCfg.googleSheetScriptUrl) {
-        try {
-          const payload = {
-            action: "saveConfig",
-            config: {
-              graduate_name: newCfg.graduate.fullName,
-              degree_title: newCfg.graduate.degreeTitle,
-              university: newCfg.graduate.university,
-              ceremony_date: newCfg.ceremony.dateTime,
-              time: newCfg.ceremony.time,
-              date_formatted: newCfg.ceremony.dateFormatted,
-              venue_name: newCfg.ceremony.venueName,
-              address: newCfg.ceremony.address,
-              maps_url: newCfg.ceremony.googleMapsUrl,
-              contact_phone: newCfg.contact.phone,
-              contact_person: newCfg.contact.personName,
-              music_url: newCfg.audio.url,
-              photo_urls: newCfg.photos.join(","),
-              guests_json: JSON.stringify(currentGuestList || [])
-            }
-          };
-
-          await fetch(newCfg.googleSheetScriptUrl, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
-          });
-        } catch (e) {
-          console.warn("Lỗi gửi lên Sheets:", e);
+        const res = await sendSaveToGoogleSheets(newCfg.googleSheetScriptUrl, savePayload);
+        if (res.success && !res.isBlind) {
+          refreshPreview();
+          showToast("✅ Đã lưu và đồng bộ lên Google Sheets thành công!");
+        } else if (res.isOldVersion) {
+          refreshPreview();
+          showToast("⚠️ Chưa lưu được vào Google Sheets (cần update script)!");
+          showOldVersionModal();
+        } else {
+          refreshPreview();
+          showToast("✅ Đã lưu vào máy! Đang kết nối gửi Sheets...");
         }
+      } else {
+        refreshPreview();
+        showToast("✅ Đã lưu cấu hình vào máy!");
       }
-
-      showToast("✅ Đã lưu thay đổi & đồng bộ Google Sheets thành công!");
     }
+
+    function showOldVersionModal() {
+      const modal = document.getElementById("modalOldVersion");
+      if (modal) modal.style.display = "flex";
+    }
+
+    document.getElementById("btnCloseOldVersionModal")?.addEventListener("click", () => {
+      const modal = document.getElementById("modalOldVersion");
+      if (modal) modal.style.display = "none";
+    });
 
     function refreshPreview() {
       const iframe = document.getElementById("previewIframe");
@@ -1172,7 +1298,7 @@ Hoàng Long"></textarea>
           if (currentGuestList.length > 0) {
             renderGuestsTable();
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // Đăng ký render function toàn cục để syncFromGoogleSheets có thể gọi lại
@@ -1374,4 +1500,5 @@ Hoàng Long"></textarea>
     }
   </script>
 </body>
+
 </html>

@@ -195,8 +195,9 @@ async function loadRemoteConfigIfAvailable() {
       if (remote.ceremony_date) {
         CONFIG.ceremony.dateTime = getVal(remote.ceremony_date, localCfg?.ceremony?.dateTime, "2026-11-20T08:30:00");
       }
-      if (remote.time) {
-        CONFIG.ceremony.time = getVal(remote.time, localCfg?.ceremony?.time, "08:30");
+      const sheetTime = remote.time || remote.ceremony_time;
+      if (sheetTime) {
+        CONFIG.ceremony.time = getVal(sheetTime, localCfg?.ceremony?.time, "08:30");
       }
       if (remote.date_formatted) {
         CONFIG.ceremony.dateFormatted = getVal(remote.date_formatted, localCfg?.ceremony?.dateFormatted, "Thứ Sáu, 20 Tháng 11, 2026");
@@ -222,9 +223,7 @@ async function loadRemoteConfigIfAvailable() {
 
       if (remote.photo_urls) {
         const remotePhotos = remote.photo_urls.split(",").map(url => normalizeDriveUrl(url.trim())).filter(Boolean);
-        if (remotePhotos.length && localCfg?.photos && localCfg.photos.length) {
-          CONFIG.photos = localCfg.photos.map(normalizeDriveUrl);
-        } else if (remotePhotos.length) {
+        if (remotePhotos.length) {
           CONFIG.photos = remotePhotos;
         }
       }

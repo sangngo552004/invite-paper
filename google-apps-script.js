@@ -23,9 +23,10 @@ function doGet(e) {
   }
 
   // Hỗ trợ lưu cấu hình qua GET dự phòng
-  if (action.toLowerCase() === "saveconfig" && e.parameter.payload) {
+  if (action.toLowerCase() === "saveconfig") {
     try {
-      var parsed = JSON.parse(e.parameter.payload);
+      var rawPayload = (e.parameter && (e.parameter.payload || e.parameter.config)) ? (e.parameter.payload || e.parameter.config) : null;
+      var parsed = typeof rawPayload === "string" ? JSON.parse(rawPayload) : (rawPayload || {});
       saveConfigToSheet(ss, parsed);
       return createJsonResponse({
         status: "success",
@@ -65,7 +66,11 @@ function doPost(e) {
 
     // 1. Lưu Cấu Hình Từ Admin (saveConfig)
     if (action === "saveconfig") {
-      saveConfigToSheet(ss, data.config || {});
+      var configObj = data.config || {};
+      if (typeof configObj === "string") {
+        try { configObj = JSON.parse(configObj); } catch(err){}
+      }
+      saveConfigToSheet(ss, configObj);
       return createJsonResponse({
         status: "success",
         message: "Đã cập nhật cấu hình vào Google Sheets thành công!"
@@ -140,10 +145,17 @@ function saveConfigToSheet(ss, newConfig) {
   for (var k in newConfig) {
     if (newConfig.hasOwnProperty(k)) {
       var val = newConfig[k];
+      if (val === undefined || val === null) val = "";
+      val = val.toString();
+
       if (existingKeys[k]) {
-        sheet.getRange(existingKeys[k], 2).setValue(val);
+        var cell = sheet.getRange(existingKeys[k], 2);
+        cell.setNumberFormat("@");
+        cell.setValue(val);
       } else {
         sheet.appendRow([k, val, "Cấu hình tùy chỉnh"]);
+        var lastRow = sheet.getLastRow();
+        sheet.getRange(lastRow, 2).setNumberFormat("@");
       }
     }
   }
