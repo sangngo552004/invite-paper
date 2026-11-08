@@ -22,6 +22,20 @@ function doGet(e) {
     });
   }
 
+  // Hỗ trợ lưu cấu hình qua GET dự phòng
+  if (action.toLowerCase() === "saveconfig" && e.parameter.payload) {
+    try {
+      var parsed = JSON.parse(e.parameter.payload);
+      saveConfigToSheet(ss, parsed);
+      return createJsonResponse({
+        status: "success",
+        message: "Đã cập nhật cấu hình vào Google Sheets thành công!"
+      });
+    } catch(err) {
+      return createJsonResponse({ status: "error", message: err.toString() });
+    }
+  }
+
   return createJsonResponse({
     status: "online",
     message: "Google Apps Script Thiệp Mời Tốt Nghiệp đang hoạt động bình thường! 🎓"

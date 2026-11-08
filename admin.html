@@ -1004,10 +1004,10 @@ Hoàng Long"></textarea>
             remotePhotosList = remote.photo_urls.split(",").map(u => u.trim()).filter(Boolean);
           }
 
-          // Bảo vệ ảnh: Nếu trên máy người dùng đang có 3 ảnh (hoặc nhiều hơn trên Sheet), giữ nguyên ảnh của người dùng!
-          let finalPhotos = (localDraftPhotos.length >= remotePhotosList.length && localDraftPhotos.length > 0)
+          // Bảo vệ ảnh: Ưu tiên tuyệt đối danh sách ảnh người dùng đã lưu trên máy (ví dụ 5 ảnh), không để Sheet cũ đè mất!
+          let finalPhotos = (localDraftPhotos && localDraftPhotos.length > 0)
             ? localDraftPhotos
-            : (remotePhotosList.length ? remotePhotosList : CONFIG.photos);
+            : (remotePhotosList.length > 1 ? remotePhotosList : CONFIG.photos);
 
           renderDynamicPhotoSlots(finalPhotos);
 
