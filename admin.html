@@ -671,6 +671,9 @@ Hoàng Long"></textarea>
   <script src="env.js"></script>
   <script src="assets/js/config.js"></script>
   <script>
+    let currentGuestList = [];
+    let renderGuestsTableGlobal = null;
+
     document.addEventListener("DOMContentLoaded", () => {
       // 1. Chuyển Tab Navigation
       const tabBtns = document.querySelectorAll(".nav-tab-btn");
@@ -690,17 +693,23 @@ Hoàng Long"></textarea>
       // 2. Tải Cấu Hình Hiện Tại Lên Form
       loadConfigToForm();
 
-      // 3. Gom tất cả nút Lưu (Duy nhất 1 hành động lưu thông minh)
+      // 3. Quản Lý Khách Mời (Thêm dồn, xóa từng người, tự lưu vĩnh viễn)
+      initGuestManagerTab();
+
+      // 4. Đồng bộ dữ liệu mới nhất từ Google Sheets (nếu có kết nối)
+      syncFromGoogleSheets();
+
+      // 5. Gom tất cả nút Lưu (Duy nhất 1 hành động lưu thông minh)
       document.querySelectorAll(".btn-save-trigger").forEach(btn => {
         btn.addEventListener("click", handleMasterSave);
       });
 
-      // 4. Lắng nghe mọi thay đổi trên Form để cập nhật Live Preview tức thì
+      // 6. Lắng nghe mọi thay đổi trên Form để cập nhật Live Preview tức thì
       document.querySelectorAll(".editor-col input, .editor-col textarea").forEach(el => {
         el.addEventListener("input", broadcastConfigToPreview);
       });
 
-      // 5. Nút thêm slot ảnh mới (thêm bao nhiêu ảnh tùy thích)
+      // 7. Nút thêm slot ảnh mới (thêm bao nhiêu ảnh tùy thích)
       const btnAddPhotoSlot = document.getElementById("btnAddPhotoSlot");
       if (btnAddPhotoSlot) {
         btnAddPhotoSlot.addEventListener("click", () => {
@@ -708,7 +717,7 @@ Hoàng Long"></textarea>
         });
       }
 
-      // 6. Điều khiển chế độ xem trước (Xem ruột thiệp hoặc xem phong bì)
+      // 8. Điều khiển chế độ xem trước (Xem ruột thiệp hoặc xem phong bì)
       let currentPreviewMode = "card";
       const btnViewCard = document.getElementById("btnViewCard");
       const btnViewEnvelope = document.getElementById("btnViewEnvelope");
@@ -738,11 +747,8 @@ Hoàng Long"></textarea>
         });
       }
 
-      // 7. Nút tải lại Preview
+      // 9. Nút tải lại Preview
       document.getElementById("btnRefreshPreview").addEventListener("click", refreshPreview);
-
-      // 8. Quản Lý Khách Mời (Thêm dồn, xóa từng người, tự lưu vĩnh viễn)
-      initGuestManagerTab();
     });
 
     /**
@@ -959,6 +965,96 @@ Hoàng Long"></textarea>
     }
 
     /**
+     * Tự động đồng bộ cấu hình và danh sách khách từ Google Sheets về Form
+     */
+    async function syncFromGoogleSheets() {
+      if (!CONFIG.googleSheetScriptUrl) return;
+      try {
+        showToast("🔄 Đang tải dữ liệu từ Google Sheets...");
+        const res = await fetch(`${CONFIG.googleSheetScriptUrl}?action=getConfig&t=${Date.now()}`);
+        const json = await res.json();
+        if (json.status === "success" && json.data) {
+          const remote = json.data;
+          
+          if (remote.graduate_name) document.getElementById("editFullName").value = remote.graduate_name;
+          if (remote.degree_title) document.getElementById("editDegree").value = remote.degree_title;
+          if (remote.university) document.getElementById("editUniversity").value = remote.university;
+          if (remote.time) document.getElementById("editCeremonyTime").value = remote.time;
+          if (remote.ceremony_date) document.getElementById("editCeremonyDate").value = remote.ceremony_date.slice(0, 16);
+          if (remote.date_formatted) document.getElementById("editDateFormatted").value = formatDisplayDate(remote.date_formatted);
+          if (remote.venue_name) document.getElementById("editVenueName").value = remote.venue_name;
+          if (remote.address) document.getElementById("editAddress").value = remote.address;
+          if (remote.maps_url) document.getElementById("editMapsUrl").value = remote.maps_url;
+          if (remote.contact_phone) document.getElementById("editContactPhone").value = remote.contact_phone;
+          if (remote.contact_person) document.getElementById("editContactPerson").value = remote.contact_person;
+          if (remote.music_url) {
+            document.getElementById("editAudioUrl").value = remote.music_url;
+            const audioPreview = document.getElementById("adminAudioPreview");
+            if (audioPreview) audioPreview.src = normalizeDriveUrl(remote.music_url);
+          }
+          if (remote.photo_urls) {
+            const photos = remote.photo_urls.split(",").map(u => u.trim()).filter(Boolean);
+            if (photos.length) renderDynamicPhotoSlots(photos);
+          }
+
+          // Lưu đệm vào localStorage hiện tại
+          localStorage.setItem("invitation_admin_config", JSON.stringify(collectFormConfig()));
+
+          // Đồng bộ danh sách khách mời từ Google Sheets nếu có
+          if (remote.guests_json) {
+            try {
+              const parsedGuests = JSON.parse(remote.guests_json);
+              if (Array.isArray(parsedGuests) && parsedGuests.length > 0) {
+                let baseUrl = window.location.href.split("?")[0].replace("admin.html", "index.html");
+                if (!baseUrl.endsWith("index.html")) baseUrl = baseUrl.replace(/\/$/, "") + "/index.html";
+
+                currentGuestList = parsedGuests.map(g => ({
+                  ...g,
+                  url: `${baseUrl}?to=${encodeURIComponent(g.name)}&id=${g.id}&time=${encodeURIComponent(g.time || '08:30')}`
+                }));
+
+                localStorage.setItem("invitation_authorized_guests", JSON.stringify(currentGuestList));
+                if (typeof renderGuestsTableGlobal === "function") {
+                  renderGuestsTableGlobal();
+                }
+              }
+            } catch(e) {
+              console.warn("Lỗi đọc danh sách khách từ Sheets:", e);
+            }
+          }
+
+          broadcastConfigToPreview();
+          showToast("✅ Đã đồng bộ dữ liệu mới nhất từ Google Sheets!");
+        }
+      } catch (err) {
+        console.warn("Không thể tải cấu hình từ Google Sheets:", err);
+      }
+    }
+
+    /**
+     * Tự động đồng bộ riêng danh sách khách lên Google Sheets
+     */
+    async function syncGuestsToSheet() {
+      if (!CONFIG.googleSheetScriptUrl) return;
+      try {
+        const payload = {
+          action: "saveConfig",
+          config: {
+            guests_json: JSON.stringify(currentGuestList || [])
+          }
+        };
+        await fetch(CONFIG.googleSheetScriptUrl, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+      } catch (e) {
+        console.warn("Lỗi đồng bộ danh sách khách lên Sheets:", e);
+      }
+    }
+
+    /**
      * Nút Lưu Duy Nhất (Vừa lưu máy, vừa tự đồng bộ Google Sheets)
      */
     async function handleMasterSave() {
@@ -971,7 +1067,7 @@ Hoàng Long"></textarea>
 
       showToast("⏳ Đang lưu và đồng bộ Google Sheets...");
 
-      // 2. Tự động gửi đồng bộ thẳng vào file Google Sheets
+      // 2. Tự động gửi đồng bộ thẳng vào file Google Sheets (kèm danh sách khách mời)
       if (newCfg.googleSheetScriptUrl) {
         try {
           const payload = {
@@ -989,7 +1085,8 @@ Hoàng Long"></textarea>
               contact_phone: newCfg.contact.phone,
               contact_person: newCfg.contact.personName,
               music_url: newCfg.audio.url,
-              photo_urls: newCfg.photos.join(",")
+              photo_urls: newCfg.photos.join(","),
+              guests_json: JSON.stringify(currentGuestList || [])
             }
           };
 
@@ -1046,25 +1143,27 @@ Hoàng Long"></textarea>
         baseUrl = baseUrl.replace(/\/$/, "") + "/index.html";
       }
 
-      let guestList = [];
       let copiedIds = JSON.parse(localStorage.getItem("invitation_copied_ids") || "[]");
 
       // 1. Phục hồi danh sách khách mời đã lưu từ trước
       const savedListJson = localStorage.getItem("invitation_authorized_guests");
       if (savedListJson) {
         try {
-          guestList = JSON.parse(savedListJson);
+          currentGuestList = JSON.parse(savedListJson);
           // Vá lại link nếu cũ
-          guestList.forEach(item => {
+          currentGuestList.forEach(item => {
             if (item.url && item.url.includes("/?") && !item.url.includes("index.html?")) {
               item.url = item.url.replace("/?", "/index.html?");
             }
           });
-          if (guestList.length > 0) {
+          if (currentGuestList.length > 0) {
             renderGuestsTable();
           }
         } catch (e) {}
       }
+
+      // Đăng ký render function toàn cục để syncFromGoogleSheets có thể gọi lại
+      renderGuestsTableGlobal = renderGuestsTable;
 
       // 2. Thêm bạn bè vào danh sách (THÊM DỒN, KHÔNG RESET DANH SÁCH CŨ!)
       btnAddGuests.addEventListener("click", () => {
@@ -1079,7 +1178,7 @@ Hoàng Long"></textarea>
 
         // Tìm số thứ tự ID lớn nhất hiện tại
         let maxIdNum = 0;
-        guestList.forEach(g => {
+        currentGuestList.forEach(g => {
           const num = parseInt((g.id || "").replace(/\D/g, ""), 10);
           if (!isNaN(num) && num > maxIdNum) maxIdNum = num;
         });
@@ -1104,10 +1203,11 @@ Hoàng Long"></textarea>
         });
 
         // Nối dồn vào danh sách hiện tại
-        guestList = guestList.concat(newGuests);
+        currentGuestList = currentGuestList.concat(newGuests);
 
-        // Lưu danh sách hợp lệ (Whitelist) vào localStorage
-        saveGuestList(guestList);
+        // Lưu danh sách hợp lệ (Whitelist) vào localStorage & đồng bộ Sheets
+        saveGuestList(currentGuestList);
+        syncGuestsToSheet();
 
         // Xóa ô nhập để tiện nhập đợt sau
         namesTextarea.value = "";
@@ -1124,7 +1224,7 @@ Hoàng Long"></textarea>
         linksTableBody.innerHTML = "";
         let copiedCount = 0;
 
-        guestList.forEach((item, index) => {
+        currentGuestList.forEach((item, index) => {
           const isCopied = copiedIds.includes(item.id);
           if (isCopied) copiedCount++;
 
@@ -1146,17 +1246,17 @@ Hoàng Long"></textarea>
           linksTableBody.appendChild(tr);
         });
 
-        totalCount.textContent = guestList.length;
-        if (tabGuestCount) tabGuestCount.textContent = guestList.length;
+        totalCount.textContent = currentGuestList.length;
+        if (tabGuestCount) tabGuestCount.textContent = currentGuestList.length;
 
         if (copiedCountBadge) {
-          copiedCountBadge.textContent = `Đã copy gửi: ${copiedCount} / ${guestList.length}`;
+          copiedCountBadge.textContent = `Đã copy gửi: ${copiedCount} / ${currentGuestList.length}`;
         }
 
-        resultCard.style.display = guestList.length > 0 ? "block" : "none";
-        btnCopyAll.style.display = guestList.length > 0 ? "inline-flex" : "none";
-        btnExportCsv.style.display = guestList.length > 0 ? "inline-flex" : "none";
-        btnClearAllGuests.style.display = guestList.length > 0 ? "inline-flex" : "none";
+        resultCard.style.display = currentGuestList.length > 0 ? "block" : "none";
+        btnCopyAll.style.display = currentGuestList.length > 0 ? "inline-flex" : "none";
+        btnExportCsv.style.display = currentGuestList.length > 0 ? "inline-flex" : "none";
+        btnClearAllGuests.style.display = currentGuestList.length > 0 ? "inline-flex" : "none";
       }
 
       // 3. Xử lý nút Copy & Nút XÓA TỪNG NGƯỜI
@@ -1179,7 +1279,7 @@ Hoàng Long"></textarea>
           e.target.textContent = "✓ Đã copy";
 
           if (copiedCountBadge) {
-            copiedCountBadge.textContent = `Đã copy gửi: ${copiedIds.length} / ${guestList.length}`;
+            copiedCountBadge.textContent = `Đã copy gửi: ${copiedIds.length} / ${currentGuestList.length}`;
           }
           showToast(`Đã copy link!`);
         }
@@ -1187,14 +1287,15 @@ Hoàng Long"></textarea>
         // Xóa TỪNG NGƯỜI
         if (e.target.classList.contains("btn-delete-guest")) {
           const id = e.target.getAttribute("data-id");
-          const guestToDelete = guestList.find(g => g.id === id);
+          const guestToDelete = currentGuestList.find(g => g.id === id);
           const name = guestToDelete ? guestToDelete.name : "người này";
 
           if (confirm(`Bạn có chắc muốn xóa "${name}" khỏi danh sách khách mời không? (Link của người này sẽ bị vô hiệu hóa)`)) {
-            guestList = guestList.filter(g => g.id !== id);
+            currentGuestList = currentGuestList.filter(g => g.id !== id);
             copiedIds = copiedIds.filter(cid => cid !== id);
             localStorage.setItem("invitation_copied_ids", JSON.stringify(copiedIds));
-            saveGuestList(guestList);
+            saveGuestList(currentGuestList);
+            syncGuestsToSheet();
             renderGuestsTable();
             showToast(`Đã xóa ${name} khỏi danh sách!`);
           }
@@ -1203,17 +1304,17 @@ Hoàng Long"></textarea>
 
       // 4. Sao chép tất cả link
       btnCopyAll.addEventListener("click", () => {
-        if (!guestList.length) return;
-        const allText = guestList.map(item => `${item.name} (${item.time}): ${item.url}`).join("\n");
+        if (!currentGuestList.length) return;
+        const allText = currentGuestList.map(item => `${item.name} (${item.time}): ${item.url}`).join("\n");
         copyText(allText);
         showToast("Đã sao chép tất cả link mời!");
       });
 
       // 5. Tải file Excel / CSV
       btnExportCsv.addEventListener("click", () => {
-        if (!guestList.length) return;
+        if (!currentGuestList.length) return;
         let csv = "\uFEFFSTT,Tên Khách Mời,Khung Giờ Mời,Mã ID,Đường Dẫn Link Mời\n";
-        guestList.forEach((item, idx) => {
+        currentGuestList.forEach((item, idx) => {
           csv += `"${idx + 1}","${item.name}","${item.time}","${item.id}","${item.url}"\n`;
         });
         const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -1228,8 +1329,9 @@ Hoàng Long"></textarea>
         if (confirm("Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách khách mời không?")) {
           localStorage.removeItem("invitation_authorized_guests");
           localStorage.removeItem("invitation_copied_ids");
-          guestList = [];
+          currentGuestList = [];
           copiedIds = [];
+          syncGuestsToSheet();
           renderGuestsTable();
           showToast("Đã xóa toàn bộ danh sách khách mời!");
         }

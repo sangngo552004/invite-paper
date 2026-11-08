@@ -225,6 +225,37 @@ async function loadRemoteConfigIfAvailable() {
           CONFIG.photos = remotePhotos;
         }
       }
+
+      // Đồng bộ danh sách khách hợp lệ từ Google Sheets để hỗ trợ mở trên mọi thiết bị
+      if (remote.guests_json) {
+        try {
+          const remoteGuests = JSON.parse(remote.guests_json);
+          if (Array.isArray(remoteGuests) && remoteGuests.length > 0) {
+            localStorage.setItem("invitation_authorized_guests", JSON.stringify(remoteGuests));
+            
+            // Nếu ban đầu trang bị chặn do thiết bị chưa có whitelist:
+            const unauthScreen = document.getElementById("unauthorizedScreen");
+            const urlParams = new URLSearchParams(window.location.search);
+            const gId = urlParams.get("id");
+            if (gId) {
+              const validGuest = remoteGuests.find(g => g.id === gId);
+              if (validGuest) {
+                if (unauthScreen) unauthScreen.style.display = "none";
+                const envelopeScreen = document.getElementById("envelopeScreen");
+                const mainWrapper = document.querySelector(".main-wrapper");
+                if (envelopeScreen) envelopeScreen.style.display = "";
+                if (mainWrapper) mainWrapper.style.display = "";
+                initGuestDetails(validGuest.name, validGuest.id);
+                if (validGuest.time) {
+                  CONFIG.ceremony.time = validGuest.time;
+                  const timeEl = document.getElementById("ceremonyTime");
+                  if (timeEl) timeEl.textContent = validGuest.time;
+                }
+              }
+            }
+          }
+        } catch(e) {}
+      }
     }
   } catch (err) {
     console.warn("Không thể tải cấu hình từ Google Sheets, dùng dữ liệu hiện tại:", err);
