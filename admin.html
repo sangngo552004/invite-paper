@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Studio - Chỉnh Sửa Thiệp & Quản Lý Khách Mời 🎓</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-sage: #F2F6F3;
+      --bg-card: #FFFFFF;
+      --primary: #557A66;
+      --primary-hover: #466755;
+      --primary-subtle: #E6EFE9;
+      --accent-gold: #CDB375;
+      --accent-gold-dark: #A88D4E;
+      --text: #2C3831;
+      --text-muted: #6B7C72;
+      --border: #DCE8E0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-sage);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 16px 16px 80px 16px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Top Sticky Action Bar */
+    .top-action-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 6px 20px rgba(85, 122, 102, 0.1);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .top-bar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .nav-tab-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: #FFFFFF;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .nav-tab-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(85, 122, 102, 0.2);
+    }
+
+    /* Tab Panes */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Studio Grid */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 960px) {
+      .studio-grid {
+        grid-template-columns: 1fr 400px;
+        align-items: start;
+      }
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-card);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      padding: 22px;
+      box-shadow: 0 4px 18px rgba(85, 122, 102, 0.04);
+      margin-bottom: 20px;
+    }
+
+    .card-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #FAFBF9;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(85, 122, 102, 0.15);
+      background: #FFFFFF;
+    }
+
+    .hint-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-save-master {
+      background: var(--primary);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(85, 122, 102, 0.3);
+      padding: 9px 20px;
+      font-size: 0.95rem;
+    }
+
+    .btn-save-master:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-save-mini {
+      background: var(--primary-subtle);
+      color: var(--primary);
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    .btn-save-mini:hover {
+      background: var(--primary);
+      color: #FFF;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--primary-subtle);
+      color: var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: #DAE7DE;
+    }
+
+    .btn-danger {
+      background: #FDF2F2;
+      color: #C0392B;
+      border: 1px solid #F5C6CB;
+    }
+
+    .btn-danger:hover {
+      background: #C0392B;
+      color: #FFF;
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+    }
+
+    /* Photo Slots */
+    .photo-slot-card {
+      background: #F7FAF8;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .photo-thumb-preview {
+      width: 58px;
+      height: 72px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #EAEFEA;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .photo-slot-content {
+      flex: 1;
+    }
+
+    .photo-slot-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    /* Live Phone Preview Sticky */
+    .preview-sticky {
+      position: sticky;
+      top: 80px;
+    }
+
+    .phone-mockup {
+      width: 100%;
+      max-width: 370px;
+      margin: 0 auto;
+      height: 680px;
+      background: #FFFFFF;
+      border: 10px solid #2C3831;
+      border-radius: 36px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.16);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-mockup-header {
+      background: #2C3831;
+      color: #FFF;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .phone-mockup-iframe {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: #FAFBF9;
+    }
+
+    /* Table Styles */
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #F7FAF8;
+      color: var(--primary);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    .link-cell {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--primary);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #2C3831;
+      color: #FFF;
+      padding: 10px 22px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      opacity: 0;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Action Bar -->
+    <header class="top-action-bar">
+      <div class="top-bar-title">Thiệp Tốt Nghiệp 🎓</div>
+      
+      <!-- 2 Tabs điều hướng -->
+      <nav class="nav-tabs">
+        <button id="btnTabEditor" class="nav-tab-btn active" data-tab="tab-editor">
+          <span>✏️ Chỉnh Sửa Thiệp</span>
+        </button>
+        <button id="btnTabGenerator" class="nav-tab-btn" data-tab="tab-generator">
+          <span>🔗 Quản Lý Khách Mời (<span id="tabGuestCount">0</span>)</span>
+        </button>
+      </nav>
+
+      <!-- Duy nhất 1 nút Lưu chính -->
+      <button class="btn btn-save-master btn-save-trigger" title="Lưu thay đổi">
+        💾 Lưu Thay Đổi
+      </button>
+    </header>
+
+    <!-- ==========================================================================
+         TAB 1: CHỈNH SỬA THIỆP & XEM TRƯỚC
+         ========================================================================== -->
+    <section id="tab-editor" class="tab-pane active">
+      <div class="studio-grid">
+        
+        <!-- Cột Form Chỉnh Sửa -->
+        <div class="editor-col">
+
+          <!-- 1. Thông Tin Cử Nhân -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div class="card-title">
+                <span>🎓 Cử Nhân (Chủ Tiệc)</span>
+              </div>
+              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
+            </div>
+
+            <div class="form-group">
+              <label for="editFullName">Họ và tên cử nhân</label>
+              <input type="text" id="editFullName" placeholder="Nguyễn Văn A">
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="editDegree">Ngành học / Bằng cấp</label>
+                <input type="text" id="editDegree" placeholder="Cử nhân Công nghệ Thông tin">
+              </div>
+              <div class="form-group">
+                <label for="editUniversity">Tên trường đại học</label>
+                <input type="text" id="editUniversity" placeholder="Đại học Bách Khoa TP.HCM">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Thời Gian & Địa Điểm -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div class="card-title">
+                <span>📅 Thời Gian & Địa Điểm</span>
+              </div>
+              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="editCeremonyTime">Giờ mời chung mặc định</label>
+                <input type="text" id="editCeremonyTime" placeholder="08:30">
+                <div class="hint-text">Có thể chia giờ riêng cho từng khách ở tab Quản Lý Khách Mời.</div>
+              </div>
+
+              <div class="form-group">
+                <label for="editDateFormatted">Ngày làm lễ (hiển thị trên thiệp)</label>
+                <input type="text" id="editDateFormatted" placeholder="Thứ Sáu, 20 Tháng 11, 2026">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="editCeremonyDate">Mốc ngày giờ (Đếm ngược)</label>
+              <input type="datetime-local" id="editCeremonyDate">
+              <div class="hint-text">Dùng để đồng hồ đếm ngược hoạt động chính xác.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="editVenueName">Hội trường / Phòng làm lễ</label>
+              <input type="text" id="editVenueName" placeholder="Hội trường A5, Đại học Bách Khoa TP.HCM">
+            </div>
+
+            <div class="form-group">
+              <label for="editAddress">Địa chỉ chi tiết</label>
+              <input type="text" id="editAddress" placeholder="268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM">
+            </div>
+
+            <div class="form-group">
+              <label for="editMapsUrl">Link Google Maps dẫn đường</label>
+              <input type="url" id="editMapsUrl" placeholder="https://maps.google.com/?q=...">
+            </div>
+          </div>
+
+          <!-- 3. Quản Lý Ảnh Cử Nhân (Thêm Bao Nhiêu Ảnh Tùy Thích) -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div class="card-title">
+                <span>🖼️ Ảnh Cử Nhân (<span id="photoCountBadge">1</span> ảnh)</span>
+              </div>
+              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
+            </div>
+            
+            <p class="hint-text" style="margin-bottom: 12px;">
+              💡 <strong>Thêm bao nhiêu ảnh tùy thích:</strong> Dán link ảnh hoặc link Google Drive (chia sẻ "Bất kỳ ai có liên kết"). Nếu có từ 2 ảnh trở lên, thiệp sẽ tự động hiện 2 nút lật ảnh và chuyển ảnh mượt mà!
+            </p>
+
+            <!-- Danh sách các ô ảnh động -->
+            <div id="photoSlotsContainer"></div>
+
+            <button type="button" id="btnAddPhotoSlot" class="btn btn-secondary btn-sm" style="margin-top: 6px; width: 100%;">
+              ➕ Thêm Ảnh Khác
+            </button>
+          </div>
+
+          <!-- 4. Thông Tin Liên Hệ Đón Khách -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div class="card-title">
+                <span>📞 Liên Hệ Đón Khách (SĐT / Zalo)</span>
+              </div>
+              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
+            </div>
+
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="editContactPhone">Số điện thoại (đồng thời là Zalo)</label>
+                <input type="tel" id="editContactPhone" placeholder="0901 234 567">
+              </div>
+
+              <div class="form-group">
+                <label for="editContactPerson">Tên người đón tiếp</label>
+                <input type="text" id="editContactPerson" placeholder="Nguyễn Văn A">
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Nhạc Nền -->
+          <div class="card">
+            <div class="card-header-flex">
+              <div class="card-title">
+                <span>🎵 Nhạc Nền (Audio)</span>
+              </div>
+              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
+            </div>
+
+            <div class="form-group">
+              <label for="editAudioUrl">Link bài hát (Link MP3 hoặc link Google Drive)</label>
+              <input type="text" id="editAudioUrl" placeholder="assets/audio/nhac.mp3 hoặc link Google Drive...">
+              <div class="hint-text">Hỗ trợ dán link Google Drive chia sẻ công khai.</div>
+            </div>
+
+            <div class="form-group">
+              <audio id="adminAudioPreview" controls style="width: 100%; height: 38px; margin-top: 6px;"></audio>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Cột Phải: Xem Trước Thiệp (Live Mobile Preview) -->
+        <div class="preview-col">
+          <div class="preview-sticky">
+            <div class="phone-mockup">
+              <div class="phone-mockup-header">
+                <span>📱 Xem Trước Thiệp</span>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <button id="btnViewCard" title="Xem nội dung thiệp" style="background:#557A66; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">📜 Xem Thiệp</button>
+                  <button id="btnViewEnvelope" title="Xem phong bì" style="background:#444; border:none; color:#FFF; padding:2px 8px; border-radius:12px; font-size:0.75rem; cursor:pointer;">✉️ Phong Bì</button>
+                  <button id="btnRefreshPreview" title="Tải lại preview" style="background:none; border:none; color:#FFF; cursor:pointer; font-size:0.9rem;">🔄</button>
+                  <a href="index.html?to=Xem+Trước&id=demo&preview=true" target="_blank" title="Mở tab mới đầy đủ" style="color:#FFF; text-decoration:none; font-size:0.9rem;">↗️</a>
+                </div>
+              </div>
+              <iframe id="previewIframe" class="phone-mockup-iframe" src="index.html?to=Xem+Trước&id=demo&preview=true"></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         TAB 2: QUẢN LÝ DANH SÁCH KHÁCH MỜI (BẢO MẬT & THÊM/XÓA TỪNG NGƯỜI)
+         ========================================================================== -->
+    <section id="tab-generator" class="tab-pane">
+      <div class="card">
+        <div class="card-title">
+          <span>➕ Thêm Bạn Bè Vào Danh Sách Khách Mời</span>
+        </div>
+
+        <p class="hint-text" style="margin-bottom: 12px;">
+          Gõ tên bạn bè (mỗi người 1 dòng).<br>
+          💡 <strong>Mẹo chia giờ riêng:</strong> Gõ thêm dấu gạch đứng <code>|</code> kèm giờ, ví dụ: <code>Anh Tuấn | 09:00</code>.<br>
+          🔒 <strong>Bảo mật:</strong> Chỉ những người <strong>thật sự có trong danh sách bên dưới</strong> mới mở được thiệp! Bất kỳ ai tự gõ tên lạ vào đường dẫn đều sẽ bị chặn thông báo link không hợp lệ.
+        </p>
+
+        <div class="form-group">
+          <textarea id="namesTextarea" rows="4" placeholder="Lan
+Anh Tuấn | 09:00
+Bảo Châu & Người thương | 09:30
+Hoàng Long"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btnAddGuests" class="btn btn-primary" style="padding: 10px 22px;">
+            ➕ Thêm Vào Danh Sách Khách
+          </button>
+          <button id="btnCopyAll" class="btn btn-secondary" style="display: none;">
+            📋 Sao chép tất cả link
+          </button>
+          <button id="btnExportCsv" class="btn btn-secondary" style="display: none;">
+            📥 Tải File Excel / CSV
+          </button>
+          <button id="btnClearAllGuests" class="btn btn-danger" style="display: none; margin-left: auto;">
+            🗑️ Xóa toàn bộ danh sách
+          </button>
+        </div>
+      </div>
+
+      <!-- Bảng Danh Sách Khách Mời Đã Lưu -->
+      <div id="resultCard" class="card" style="display: none;">
+        <div class="card-header-flex">
+          <div class="card-title">
+            <span>📋 Danh Sách Khách Mời Hợp Lệ (<span id="totalCount">0</span> người)</span>
+          </div>
+          <span id="copiedCountBadge" style="font-size:0.82rem; color:var(--primary); font-weight:600; background:var(--primary-subtle); padding:4px 10px; border-radius:12px;">Đã copy: 0/0</span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="linksTable">
+            <thead>
+              <tr>
+                <th style="width: 50px;">STT</th>
+                <th>Tên Khách Mời</th>
+                <th style="width: 90px;">Mã ID</th>
+                <th style="width: 100px;">Giờ Mời</th>
+                <th>Đường Dẫn Link Mời</th>
+                <th style="width: 160px;">Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="linksTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast Thông Báo -->
+  <div id="toast" class="toast">Đã lưu thay đổi thành công!</div>
+
+  <!-- Scripts -->
+  <script src="env.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Chuyển Tab Navigation
+      const tabBtns = document.querySelectorAll(".nav-tab-btn");
+      const tabPanes = document.querySelectorAll(".tab-pane");
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          tabBtns.forEach(b => b.classList.remove("active"));
+          tabPanes.forEach(p => p.classList.remove("active"));
+
+          btn.classList.add("active");
+          const targetTab = document.getElementById(btn.getAttribute("data-tab"));
+          if (targetTab) targetTab.classList.add("active");
+        });
+      });
+
+      // 2. Tải Cấu Hình Hiện Tại Lên Form
+      loadConfigToForm();
+
+      // 3. Gom tất cả nút Lưu (Duy nhất 1 hành động lưu thông minh)
+      document.querySelectorAll(".btn-save-trigger").forEach(btn => {
+        btn.addEventListener("click", handleMasterSave);
+      });
+
+      // 4. Lắng nghe mọi thay đổi trên Form để cập nhật Live Preview tức thì
+      document.querySelectorAll(".editor-col input, .editor-col textarea").forEach(el => {
+        el.addEventListener("input", broadcastConfigToPreview);
+      });
+
+      // 5. Nút thêm slot ảnh mới (thêm bao nhiêu ảnh tùy thích)
+      const btnAddPhotoSlot = document.getElementById("btnAddPhotoSlot");
+      if (btnAddPhotoSlot) {
+        btnAddPhotoSlot.addEventListener("click", () => {
+          addSinglePhotoSlot("");
+        });
+      }
+
+      // 6. Điều khiển chế độ xem trước (Xem ruột thiệp hoặc xem phong bì)
+      let currentPreviewMode = "card";
+      const btnViewCard = document.getElementById("btnViewCard");
+      const btnViewEnvelope = document.getElementById("btnViewEnvelope");
+      const previewIframe = document.getElementById("previewIframe");
+
+      if (btnViewCard) {
+        btnViewCard.addEventListener("click", () => {
+          currentPreviewMode = "card";
+          btnViewCard.style.background = "#557A66";
+          btnViewEnvelope.style.background = "#444";
+          refreshPreview();
+        });
+      }
+
+      if (btnViewEnvelope) {
+        btnViewEnvelope.addEventListener("click", () => {
+          currentPreviewMode = "envelope";
+          btnViewEnvelope.style.background = "#557A66";
+          btnViewCard.style.background = "#444";
+          refreshPreview();
+        });
+      }
+
+      if (previewIframe) {
+        previewIframe.addEventListener("load", () => {
+          broadcastConfigToPreview();
+        });
+      }
+
+      // 7. Nút tải lại Preview
+      document.getElementById("btnRefreshPreview").addEventListener("click", refreshPreview);
+
+      // 8. Quản Lý Khách Mời (Thêm dồn, xóa từng người, tự lưu vĩnh viễn)
+      initGuestManagerTab();
+    });
+
+    /**
+     * Tự động chuẩn hóa link Google Drive và Dropbox sang link phát trực tiếp
+     */
+    function normalizeDriveUrl(url) {
+      if (!url || typeof url !== "string") return url;
+      let trimmed = url.trim();
+
+      // Xử lý link Dropbox (chuyển dl=0 thành raw=1 để phát được trực tiếp)
+      if (trimmed.includes("dropbox.com")) {
+        return trimmed.replace("dl=0", "raw=1").replace("?dl=1", "?raw=1");
+      }
+
+      // Xử lý link Google Drive
+      if (trimmed.includes("drive.google.com")) {
+        const match = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+          return `https://drive.google.com/uc?export=download&id=${match[1]}`;
+        }
+      }
+      return trimmed;
+    }
+
+    /**
+     * Định dạng ngày tiếng Việt đẹp mắt, tránh chuỗi thô ISO (2026-11-19T...)
+     */
+    function formatDisplayDate(rawDate) {
+      if (!rawDate) return "Thứ Sáu, ngày 20/11/2026";
+      const str = String(rawDate).trim();
+      if (!str.includes("T") && !str.includes("Z") && !/^\d{4}-\d{2}-\d{2}/.test(str)) {
+        return str;
+      }
+      try {
+        const d = new Date(str);
+        if (isNaN(d.getTime())) return str;
+        const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        const dayOfWeek = days[d.getDay()];
+        const dateNum = String(d.getDate()).padStart(2, "0");
+        const monthNum = String(d.getMonth() + 1).padStart(2, "0");
+        const yearNum = d.getFullYear();
+        return `${dayOfWeek}, ngày ${dateNum}/${monthNum}/${yearNum}`;
+      } catch (e) {
+        return str;
+      }
+    }
+
+    /**
+     * Tải dữ liệu vào Form
+     */
+    function loadConfigToForm() {
+      let cfg = CONFIG;
+      try {
+        const saved = localStorage.getItem("invitation_admin_config");
+        if (saved) cfg = Object.assign({}, CONFIG, JSON.parse(saved));
+      } catch (e) {}
+
+      document.getElementById("editFullName").value = cfg.graduate.fullName || "";
+      document.getElementById("editDegree").value = cfg.graduate.degreeTitle || "";
+      document.getElementById("editUniversity").value = cfg.graduate.university || "";
+
+      document.getElementById("editCeremonyTime").value = cfg.ceremony.time || "08:30";
+      document.getElementById("editDateFormatted").value = formatDisplayDate(cfg.ceremony.dateFormatted || cfg.ceremony.dateTime || "Thứ Sáu, 20 Tháng 11, 2026");
+      document.getElementById("editCeremonyDate").value = cfg.ceremony.dateTime ? cfg.ceremony.dateTime.slice(0, 16) : "";
+      document.getElementById("editVenueName").value = cfg.ceremony.venueName || "";
+      document.getElementById("editAddress").value = cfg.ceremony.address || "";
+      document.getElementById("editMapsUrl").value = cfg.ceremony.googleMapsUrl || "";
+
+      const ceremonyDateInput = document.getElementById("editCeremonyDate");
+      ceremonyDateInput.addEventListener("change", function() {
+        if (this.value) {
+          document.getElementById("editDateFormatted").value = formatDisplayDate(this.value);
+          broadcastConfigToPreview();
+        }
+      });
+
+      document.getElementById("editContactPhone").value = cfg.contact.phone || "";
+      document.getElementById("editContactPerson").value = cfg.contact.personName || "";
+
+      // Load danh sách ảnh động (bao nhiêu ảnh cũng được)
+      const photos = (cfg.photos && cfg.photos.length) ? cfg.photos : [
+        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000"
+      ];
+      renderDynamicPhotoSlots(photos);
+
+      const audioUrlInput = document.getElementById("editAudioUrl");
+      const audioPreview = document.getElementById("adminAudioPreview");
+      if (cfg.audio && cfg.audio.url) {
+        audioUrlInput.value = cfg.audio.url;
+        audioPreview.src = normalizeDriveUrl(cfg.audio.url);
+      }
+
+      audioUrlInput.addEventListener("input", () => {
+        if (audioUrlInput.value.trim()) {
+          audioPreview.src = normalizeDriveUrl(audioUrlInput.value.trim());
+        }
+      });
+    }
+
+    function renderDynamicPhotoSlots(photosList) {
+      const container = document.getElementById("photoSlotsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      photosList.forEach((url, idx) => {
+        addSinglePhotoSlot(url, idx + 1);
+      });
+      updatePhotoCountBadge();
+    }
+
+    function addSinglePhotoSlot(url = "", slotNumber) {
+      const container = document.getElementById("photoSlotsContainer");
+      if (!container) return;
+
+      const num = slotNumber || (container.children.length + 1);
+      const slotCard = document.createElement("div");
+      slotCard.className = "photo-slot-card";
+
+      const thumbUrl = url ? normalizeDriveUrl(url) : "";
+
+      slotCard.innerHTML = `
+        <img class="photo-thumb-preview" src="${thumbUrl}" alt="Ảnh ${num}" style="${thumbUrl ? '' : 'display:none;'}">
+        <div class="photo-slot-content">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span class="photo-slot-label">Ảnh ${num} ${num === 1 ? '(Ảnh chính)' : ''}</span>
+            ${num > 1 ? '<button type="button" class="btn btn-danger btn-sm btn-delete-photo" title="Xóa ảnh này" style="padding:2px 8px; font-size:0.75rem;">🗑️ Xóa</button>' : ''}
+          </div>
+          <input type="text" class="photo-url-input" placeholder="Dán link ảnh hoặc link Google Drive..." value="${url}">
+        </div>
+      `;
+
+      const input = slotCard.querySelector(".photo-url-input");
+      const thumb = slotCard.querySelector(".photo-thumb-preview");
+      const deleteBtn = slotCard.querySelector(".btn-delete-photo");
+
+      input.addEventListener("input", () => {
+        const val = input.value.trim();
+        if (val) {
+          thumb.src = normalizeDriveUrl(val);
+          thumb.style.display = "block";
+        } else {
+          thumb.style.display = "none";
+        }
+        broadcastConfigToPreview();
+      });
+
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => {
+          slotCard.remove();
+          reindexPhotoSlots();
+          broadcastConfigToPreview();
+        });
+      }
+
+      container.appendChild(slotCard);
+      updatePhotoCountBadge();
+    }
+
+    function reindexPhotoSlots() {
+      const container = document.getElementById("photoSlotsContainer");
+      if (!container) return;
+      const cards = container.querySelectorAll(".photo-slot-card");
+      cards.forEach((card, idx) => {
+        const num = idx + 1;
+        const label = card.querySelector(".photo-slot-label");
+        if (label) label.textContent = `Ảnh ${num} ${num === 1 ? '(Ảnh chính)' : ''}`;
+      });
+      updatePhotoCountBadge();
+    }
+
+    function updatePhotoCountBadge() {
+      const container = document.getElementById("photoSlotsContainer");
+      const badge = document.getElementById("photoCountBadge");
+      if (container && badge) {
+        badge.textContent = container.children.length;
+      }
+    }
+
+    /**
+     * Thu thập dữ liệu từ Form
+     */
+    function collectFormConfig() {
+      const photoInputs = document.querySelectorAll(".photo-url-input");
+      const photos = Array.from(photoInputs).map(inp => inp.value.trim()).filter(Boolean);
+
+      return {
+        googleSheetScriptUrl: CONFIG.googleSheetScriptUrl || "",
+        graduate: {
+          fullName: document.getElementById("editFullName").value.trim(),
+          degreeTitle: document.getElementById("editDegree").value.trim(),
+          university: document.getElementById("editUniversity").value.trim()
+        },
+        ceremony: {
+          dateTime: document.getElementById("editCeremonyDate").value,
+          time: document.getElementById("editCeremonyTime").value.trim() || "08:30",
+          dateFormatted: formatDisplayDate(document.getElementById("editDateFormatted").value.trim() || document.getElementById("editCeremonyDate").value),
+          venueName: document.getElementById("editVenueName").value.trim(),
+          address: document.getElementById("editAddress").value.trim(),
+          googleMapsUrl: document.getElementById("editMapsUrl").value.trim()
+        },
+        photos: photos.length ? photos : [
+          "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000"
+        ],
+        contact: {
+          phone: document.getElementById("editContactPhone").value.trim(),
+          personName: document.getElementById("editContactPerson").value.trim()
+        },
+        audio: {
+          enabled: true,
+          url: document.getElementById("editAudioUrl").value.trim() || CONFIG.audio.url,
+          autoPlayOnOpen: true
+        }
+      };
+    }
+
+    /**
+     * Nút Lưu Duy Nhất (Vừa lưu máy, vừa tự đồng bộ Google Sheets)
+     */
+    async function handleMasterSave() {
+      const newCfg = collectFormConfig();
+
+      // 1. Lưu vào localStorage để web áp dụng ngay lập tức
+      localStorage.setItem("invitation_admin_config", JSON.stringify(newCfg));
+      broadcastConfigToPreview();
+      refreshPreview();
+
+      showToast("⏳ Đang lưu và đồng bộ Google Sheets...");
+
+      // 2. Tự động gửi đồng bộ thẳng vào file Google Sheets
+      if (newCfg.googleSheetScriptUrl) {
+        try {
+          const payload = {
+            action: "saveConfig",
+            config: {
+              graduate_name: newCfg.graduate.fullName,
+              degree_title: newCfg.graduate.degreeTitle,
+              university: newCfg.graduate.university,
+              ceremony_date: newCfg.ceremony.dateTime,
+              time: newCfg.ceremony.time,
+              date_formatted: newCfg.ceremony.dateFormatted,
+              venue_name: newCfg.ceremony.venueName,
+              address: newCfg.ceremony.address,
+              maps_url: newCfg.ceremony.googleMapsUrl,
+              contact_phone: newCfg.contact.phone,
+              contact_person: newCfg.contact.personName,
+              music_url: newCfg.audio.url,
+              photo_urls: newCfg.photos.join(",")
+            }
+          };
+
+          await fetch(newCfg.googleSheetScriptUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+        } catch (e) {
+          console.warn("Lỗi gửi lên Sheets:", e);
+        }
+      }
+
+      showToast("✅ Đã lưu thay đổi & đồng bộ Google Sheets thành công!");
+    }
+
+    function refreshPreview() {
+      const iframe = document.getElementById("previewIframe");
+      if (iframe) {
+        const previewParam = currentPreviewMode === "card" ? "&preview=true" : "";
+        iframe.src = `index.html?to=Xem+Trước&id=demo${previewParam}&t=${Date.now()}`;
+      }
+    }
+
+    function broadcastConfigToPreview() {
+      const iframe = document.getElementById("previewIframe");
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({
+          type: "UPDATE_CONFIG",
+          config: collectFormConfig()
+        }, "*");
+      }
+    }
+
+    /**
+     * Quản Lý Khách Mời (Thêm dồn, xóa từng người, whitelist bảo mật)
+     */
+    function initGuestManagerTab() {
+      const namesTextarea = document.getElementById("namesTextarea");
+      const btnAddGuests = document.getElementById("btnAddGuests");
+      const btnCopyAll = document.getElementById("btnCopyAll");
+      const btnExportCsv = document.getElementById("btnExportCsv");
+      const btnClearAllGuests = document.getElementById("btnClearAllGuests");
+      const resultCard = document.getElementById("resultCard");
+      const linksTableBody = document.getElementById("linksTableBody");
+      const totalCount = document.getElementById("totalCount");
+      const tabGuestCount = document.getElementById("tabGuestCount");
+      const copiedCountBadge = document.getElementById("copiedCountBadge");
+
+      // Tự động nhận diện đường dẫn web trỏ thẳng đến index.html
+      let baseUrl = window.location.href.split("?")[0].replace("admin.html", "index.html");
+      if (!baseUrl.endsWith("index.html")) {
+        baseUrl = baseUrl.replace(/\/$/, "") + "/index.html";
+      }
+
+      let guestList = [];
+      let copiedIds = JSON.parse(localStorage.getItem("invitation_copied_ids") || "[]");
+
+      // 1. Phục hồi danh sách khách mời đã lưu từ trước
+      const savedListJson = localStorage.getItem("invitation_authorized_guests");
+      if (savedListJson) {
+        try {
+          guestList = JSON.parse(savedListJson);
+          // Vá lại link nếu cũ
+          guestList.forEach(item => {
+            if (item.url && item.url.includes("/?") && !item.url.includes("index.html?")) {
+              item.url = item.url.replace("/?", "/index.html?");
+            }
+          });
+          if (guestList.length > 0) {
+            renderGuestsTable();
+          }
+        } catch (e) {}
+      }
+
+      // 2. Thêm bạn bè vào danh sách (THÊM DỒN, KHÔNG RESET DANH SÁCH CŨ!)
+      btnAddGuests.addEventListener("click", () => {
+        const rawText = namesTextarea.value.trim();
+        if (!rawText) {
+          alert("Vui lòng nhập ít nhất 1 tên bạn bè vào ô!");
+          return;
+        }
+
+        const lines = rawText.split("\n").map(l => l.trim()).filter(Boolean);
+        const defaultTime = document.getElementById("editCeremonyTime").value.trim() || "08:30";
+
+        // Tìm số thứ tự ID lớn nhất hiện tại
+        let maxIdNum = 0;
+        guestList.forEach(g => {
+          const num = parseInt((g.id || "").replace(/\D/g, ""), 10);
+          if (!isNaN(num) && num > maxIdNum) maxIdNum = num;
+        });
+
+        const newGuests = lines.map((line, idx) => {
+          let name = line;
+          let time = defaultTime;
+
+          if (line.includes("|")) {
+            const parts = line.split("|");
+            name = parts[0].trim();
+            time = parts[1].trim() || defaultTime;
+          }
+
+          const idNum = maxIdNum + idx + 1;
+          const id = `g${String(idNum).padStart(2, "0")}`;
+          const encodedName = encodeURIComponent(name);
+          const encodedTime = encodeURIComponent(time);
+          const url = `${baseUrl}?to=${encodedName}&id=${id}&time=${encodedTime}`;
+
+          return { name, time, id, url };
+        });
+
+        // Nối dồn vào danh sách hiện tại
+        guestList = guestList.concat(newGuests);
+
+        // Lưu danh sách hợp lệ (Whitelist) vào localStorage
+        saveGuestList(guestList);
+
+        // Xóa ô nhập để tiện nhập đợt sau
+        namesTextarea.value = "";
+
+        renderGuestsTable();
+        showToast(`Đã thêm thành công ${newGuests.length} người vào danh sách!`);
+      });
+
+      function saveGuestList(list) {
+        localStorage.setItem("invitation_authorized_guests", JSON.stringify(list));
+      }
+
+      function renderGuestsTable() {
+        linksTableBody.innerHTML = "";
+        let copiedCount = 0;
+
+        guestList.forEach((item, index) => {
+          const isCopied = copiedIds.includes(item.id);
+          if (isCopied) copiedCount++;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td><strong>${item.name}</strong></td>
+            <td><code style="background:#EEF2EF; padding:2px 6px; border-radius:4px; font-size:0.8rem;">${item.id}</code></td>
+            <td><span style="background:#E6EFE9; color:#557A66; padding:3px 8px; border-radius:12px; font-weight:600; font-size:0.82rem;">${item.time}</span></td>
+            <td class="link-cell" title="${item.url}">${item.url}</td>
+            <td style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-sm btn-copy ${isCopied ? 'btn-secondary' : 'btn-primary'}" data-id="${item.id}" data-url="${item.url}" style="${isCopied ? 'background:#E4ECE7; color:#2D7546; border:1px solid #B8DAC3;' : ''}">
+                ${isCopied ? '✓ Đã copy' : 'Copy'}
+              </button>
+              <a href="${item.url}" target="_blank" class="btn btn-secondary btn-sm" style="text-decoration:none;">Mở</a>
+              <button class="btn btn-danger btn-sm btn-delete-guest" data-id="${item.id}" title="Xóa người này khỏi danh sách">🗑️</button>
+            </td>
+          `;
+          linksTableBody.appendChild(tr);
+        });
+
+        totalCount.textContent = guestList.length;
+        if (tabGuestCount) tabGuestCount.textContent = guestList.length;
+
+        if (copiedCountBadge) {
+          copiedCountBadge.textContent = `Đã copy gửi: ${copiedCount} / ${guestList.length}`;
+        }
+
+        resultCard.style.display = guestList.length > 0 ? "block" : "none";
+        btnCopyAll.style.display = guestList.length > 0 ? "inline-flex" : "none";
+        btnExportCsv.style.display = guestList.length > 0 ? "inline-flex" : "none";
+        btnClearAllGuests.style.display = guestList.length > 0 ? "inline-flex" : "none";
+      }
+
+      // 3. Xử lý nút Copy & Nút XÓA TỪNG NGƯỜI
+      linksTableBody.addEventListener("click", (e) => {
+        // Copy link
+        if (e.target.classList.contains("btn-copy")) {
+          const url = e.target.getAttribute("data-url");
+          const id = e.target.getAttribute("data-id");
+          copyText(url);
+
+          if (!copiedIds.includes(id)) {
+            copiedIds.push(id);
+            localStorage.setItem("invitation_copied_ids", JSON.stringify(copiedIds));
+          }
+
+          e.target.className = "btn btn-secondary btn-sm btn-copy";
+          e.target.style.background = "#E4ECE7";
+          e.target.style.color = "#2D7546";
+          e.target.style.border = "1px solid #B8DAC3";
+          e.target.textContent = "✓ Đã copy";
+
+          if (copiedCountBadge) {
+            copiedCountBadge.textContent = `Đã copy gửi: ${copiedIds.length} / ${guestList.length}`;
+          }
+          showToast(`Đã copy link!`);
+        }
+
+        // Xóa TỪNG NGƯỜI
+        if (e.target.classList.contains("btn-delete-guest")) {
+          const id = e.target.getAttribute("data-id");
+          const guestToDelete = guestList.find(g => g.id === id);
+          const name = guestToDelete ? guestToDelete.name : "người này";
+
+          if (confirm(`Bạn có chắc muốn xóa "${name}" khỏi danh sách khách mời không? (Link của người này sẽ bị vô hiệu hóa)`)) {
+            guestList = guestList.filter(g => g.id !== id);
+            copiedIds = copiedIds.filter(cid => cid !== id);
+            localStorage.setItem("invitation_copied_ids", JSON.stringify(copiedIds));
+            saveGuestList(guestList);
+            renderGuestsTable();
+            showToast(`Đã xóa ${name} khỏi danh sách!`);
+          }
+        }
+      });
+
+      // 4. Sao chép tất cả link
+      btnCopyAll.addEventListener("click", () => {
+        if (!guestList.length) return;
+        const allText = guestList.map(item => `${item.name} (${item.time}): ${item.url}`).join("\n");
+        copyText(allText);
+        showToast("Đã sao chép tất cả link mời!");
+      });
+
+      // 5. Tải file Excel / CSV
+      btnExportCsv.addEventListener("click", () => {
+        if (!guestList.length) return;
+        let csv = "\uFEFFSTT,Tên Khách Mời,Khung Giờ Mời,Mã ID,Đường Dẫn Link Mời\n";
+        guestList.forEach((item, idx) => {
+          csv += `"${idx + 1}","${item.name}","${item.time}","${item.id}","${item.url}"\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `danh_sach_khach_moi_${Date.now()}.csv`;
+        a.click();
+      });
+
+      // 6. Xóa toàn bộ danh sách
+      btnClearAllGuests.addEventListener("click", () => {
+        if (confirm("Bạn có chắc chắn muốn xóa TOÀN BỘ danh sách khách mời không?")) {
+          localStorage.removeItem("invitation_authorized_guests");
+          localStorage.removeItem("invitation_copied_ids");
+          guestList = [];
+          copiedIds = [];
+          renderGuestsTable();
+          showToast("Đã xóa toàn bộ danh sách khách mời!");
+        }
+      });
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text);
+      } else {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

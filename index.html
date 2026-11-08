@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Thiệp Mời Lễ Tốt Nghiệp 🎓</title>
+  
+  <!-- Meta tags cho SEO & chia sẻ Zalo, Facebook, iMessage -->
+  <meta property="og:title" content="Thư Mời Lễ Tốt Nghiệp Đại Học 🎓">
+  <meta property="og:description" content="Trân trọng kính mời bạn đến chung vui cùng mình trong buổi lễ tốt nghiệp đại học!">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts: Playfair Display + Dancing Script + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Background Decorative Botanical SVG Leaves (Light Sage Green) -->
+  <div class="botanical-bg-leaves">
+    <svg class="leaf-top-left" viewBox="0 0 200 200" fill="none">
+      <path d="M20 180 C 60 120, 120 60, 180 20 C 130 50, 80 100, 20 180 Z" fill="#6B907D"/>
+      <path d="M40 160 C 80 130, 120 90, 160 50 C 120 70, 80 110, 40 160 Z" fill="#8CAFA0" opacity="0.7"/>
+      <path d="M70 140 C 100 110, 140 80, 170 30" stroke="#CDB375" stroke-width="2"/>
+    </svg>
+    <svg class="leaf-bottom-right" viewBox="0 0 200 200" fill="none">
+      <path d="M20 180 C 60 120, 120 60, 180 20 C 130 50, 80 100, 20 180 Z" fill="#6B907D"/>
+      <path d="M40 160 C 80 130, 120 90, 160 50 C 120 70, 80 110, 40 160 Z" fill="#8CAFA0" opacity="0.7"/>
+      <path d="M70 140 C 100 110, 140 80, 170 30" stroke="#CDB375" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <!-- Nút Bật/Tắt Nhạc Nền Góc Phải -->
+  <button id="musicToggle" class="music-toggle" title="Bật/Tắt nhạc nền" aria-label="Nhạc nền">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 18V5l12-2v13"></path>
+      <circle cx="6" cy="18" r="3"></circle>
+      <circle cx="18" cy="16" r="3"></circle>
+    </svg>
+  </button>
+
+  <!-- ==========================================================================
+       MÀN HÌNH CHẶN LINK LẠ (KHI KHÔNG CÓ TRONG DANH SÁCH KHÁCH MỜI ĐÃ LƯU)
+       ========================================================================== -->
+  <div id="unauthorizedScreen" class="unauthorized-screen" style="display: none;">
+    <div class="unauthorized-card">
+      <div style="font-size: 3.2rem; margin-bottom: 12px;">🔒</div>
+      <h2 class="font-serif" style="color: var(--primary-sage); font-size: 1.55rem; margin-bottom: 8px;">Thiệp Mời Không Hợp Lệ</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 16px;">
+        Rất tiếc, liên kết này không tồn tại trong danh sách khách mời chính thức của cử nhân.
+      </p>
+      <p style="font-size: 0.88rem; color: var(--primary-sage); background: var(--bg-sage-tint); padding: 12px 16px; border-radius: 12px; font-weight: 500;">
+        Vui lòng liên hệ trực tiếp với cử nhân để nhận đường link thiệp mời chính xác bạn nhé! 🎓
+      </p>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MÀN HÌNH MỞ PHONG BÌ (ENVELOPE SCREEN)
+       ========================================================================== -->
+  <div id="envelopeScreen" class="envelope-screen">
+    <div class="envelope-container">
+      
+      <div id="envelopeBody" class="envelope-body">
+        <!-- Đai giấy trang trọng có tên khách mời -->
+        <div class="envelope-belly-band">
+          <div class="envelope-to-label">Trân trọng gửi đến</div>
+          <div id="envelopeGuestName" class="envelope-guest-name font-serif">Bạn & Người thương</div>
+        </div>
+
+        <!-- Con Dấu Sáp Vàng Biểu Tượng Tốt Nghiệp -->
+        <div id="waxSeal" class="wax-seal" title="Chạm để mở thiệp">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="#4D3C15">
+            <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18C5 19.94 8.13 22 12 22C15.87 22 19 19.94 19 17.18V13.18L12 17L5 13.18Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="envelope-prompt">
+        <span>Chạm vào phong bì để mở thư</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       NỘI DUNG THIỆP MỜI CHÍNH
+       ========================================================================== -->
+  <main class="main-wrapper">
+    <article class="invitation-card">
+
+      <!-- Header Icon & Tiêu đề -->
+      <div class="card-header-badge">
+        <svg class="botanical-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <span class="sub-header-tag">Graduation Invitation</span>
+        <h1 class="main-invitation-title font-serif">Lễ Tốt Nghiệp</h1>
+      </div>
+
+      <!-- Khung Ảnh Vuông Bo Góc Cử Nhân (Square Frame With Slider Controls) -->
+      <div class="photo-arch-container photo-square-container">
+        <div id="photoArchInner" class="photo-arch-inner">
+          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop" alt="Ảnh Cử Nhân" loading="eager">
+        </div>
+
+        <!-- 2 Nút Lật Ảnh & Chấm Chỉ Số (Chỉ hiện khi có >= 2 ảnh) -->
+        <button id="photoNavPrev" class="photo-nav-btn photo-nav-prev" type="button" title="Ảnh trước" style="display: none;">‹</button>
+        <button id="photoNavNext" class="photo-nav-btn photo-nav-next" type="button" title="Ảnh tiếp theo" style="display: none;">›</button>
+        <div id="photoDotsContainer" class="photo-dots-container" style="display: none;"></div>
+      </div>
+
+      <!-- Khối Lời Mời Cá Nhân Hóa (Dynamic URL to=...) -->
+      <div class="guest-greeting-box">
+        <div class="guest-greeting-to">
+          Thân gửi: <span id="cardGuestName" class="guest-name-dynamic font-serif">Bạn & Người thương</span>
+        </div>
+        <div class="guest-greeting-body">
+          Trân trọng kính mời bạn đến chung vui và chụp những bức ảnh kỷ niệm cùng mình trong ngày tốt nghiệp đại học!
+        </div>
+      </div>
+
+      <!-- Thông tin cử nhân (Chủ tiệc) -->
+      <div class="graduate-profile">
+        <h2 id="graduateFullName" class="graduate-name font-serif">Nguyễn Văn A</h2>
+        <div id="graduateDegreeTitle" class="degree-title">Cử nhân Công nghệ Thông tin</div>
+        <div id="graduateUniversity" class="university-name">Đại học Bách Khoa - ĐHQG TP.HCM</div>
+      </div>
+
+      <!-- Đồng Hồ Đếm Ngược (Countdown) -->
+      <section class="countdown-section">
+        <div class="countdown-title">Đếm ngược đến giờ làm lễ</div>
+        <div class="countdown-grid">
+          <div class="countdown-unit">
+            <div id="countDays" class="countdown-number">00</div>
+            <div class="countdown-label">Ngày</div>
+          </div>
+          <div class="countdown-unit">
+            <div id="countHours" class="countdown-number">00</div>
+            <div class="countdown-label">Giờ</div>
+          </div>
+          <div class="countdown-unit">
+            <div id="countMins" class="countdown-number">00</div>
+            <div class="countdown-label">Phút</div>
+          </div>
+          <div class="countdown-unit">
+            <div id="countSecs" class="countdown-number">00</div>
+            <div class="countdown-label">Giây</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chi Tiết Buổi Lễ (Ceremony Details) -->
+      <section class="ceremony-details">
+        
+        <!-- Thời gian -->
+        <div class="detail-row">
+          <div class="detail-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Thời gian</div>
+            <div class="detail-value">
+              <span id="ceremonyTimeFormatted">08:30</span> — <span id="ceremonyDateFormatted">Thứ Sáu, 20 Tháng 11, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Địa điểm -->
+        <div class="detail-row">
+          <div class="detail-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+          <div class="detail-content">
+            <div class="detail-label">Địa điểm</div>
+            <div id="ceremonyVenueName" class="detail-value">Hội trường A5, Đại học Bách Khoa TP.HCM</div>
+            <div id="ceremonyAddress" class="detail-sub">268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM</div>
+          </div>
+        </div>
+
+        <!-- 2 Nút Tiện Ích: Maps & Calendar -->
+        <div class="action-buttons-group">
+          <a id="btnGoogleMaps" href="https://maps.google.com" target="_blank" rel="noopener noreferrer" class="btn-utility btn-maps">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+              <line x1="8" y1="2" x2="8" y2="18"></line>
+              <line x1="16" y1="6" x2="16" y2="22"></line>
+            </svg>
+            <span>Chỉ đường Maps</span>
+          </a>
+
+          <a id="btnGoogleCalendar" href="#" target="_blank" rel="noopener noreferrer" class="btn-utility btn-calendar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="12" y1="11" x2="12" y2="17"></line>
+              <line x1="9" y1="14" x2="15" y2="14"></line>
+            </svg>
+            <span>Lưu vào Lịch</span>
+          </a>
+        </div>
+
+      </section>
+
+      <!-- ==========================================================================
+           PHẦN 1: KHU VỰC TƯƠNG TÁC RSVP (ĐỘC LẬP)
+           ========================================================================== -->
+      <section class="rsvp-section">
+        <span class="rsvp-badge">Xác nhận tham dự</span>
+        <h3 class="rsvp-question font-serif">Bạn sẽ đến chung vui cùng mình chứ?</h3>
+        <p class="rsvp-subtext">Sự hiện diện của bạn là niềm vinh hạnh và kỷ niệm đáng nhớ nhất đối với mình!</p>
+
+        <div class="rsvp-buttons-area">
+          <!-- Nút Chắc Chắn Tham Gia -->
+          <button id="btnAttend" class="btn-attend" type="button">
+            <span>Chắc chắn tham gia ✨</span>
+          </button>
+
+          <!-- Nút Troll Né Tránh (Runaway) -->
+          <button id="btnRunaway" class="btn-decline" type="button">
+            Rất tiếc không thể
+          </button>
+        </div>
+
+        <!-- Thông báo sau khi xác nhận -->
+        <div id="rsvpStatusMessage" class="rsvp-status-message"></div>
+      </section>
+
+      <!-- ==========================================================================
+           PHẦN 2: KHU VỰC GỬI LỜI CHÚC RIÊNG TƯ (DÙNG LUÔN TÊN TRÊN LINK)
+           ========================================================================== -->
+      <section class="wishes-section">
+        <div class="wishes-header">
+          <span class="wishes-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            Sổ lưu bút
+          </span>
+          <h3 class="wishes-title font-serif">Gửi Lời Chúc Riêng Tư</h3>
+          <p class="wishes-subtext">Dù bạn có thể đến hay ở xa, những dòng nhắn nhủ của bạn đều vô cùng quý giá đối với mình.</p>
+        </div>
+
+        <!-- Cam kết tính bảo mật (Private) -->
+        <div class="privacy-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Lời chúc này được gửi riêng tư trực tiếp đến mình (không công khai trên web).</span>
+        </div>
+
+        <form id="wishForm">
+          <!-- Hiển thị tên người gửi tự động lấy từ Link, không cần nhập lại -->
+          <div class="wish-sender-badge">
+            <span class="wish-sender-label">Gửi từ:</span>
+            <span id="wishSenderDisplay" class="wish-sender-value">Bạn & Người thương</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="wishMessage">Lời chúc gửi cử nhân</label>
+            <textarea id="wishMessage" class="form-textarea" placeholder="Viết vài lời nhắn gửi đến tân cử nhân nhé..." required></textarea>
+          </div>
+
+          <button id="btnSendWish" type="submit" class="btn-send-wish">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <span>Gửi lời chúc riêng tư ❤️</span>
+          </button>
+        </form>
+
+        <div id="wishSuccessBox" class="wish-success-box">
+          <p>Lời chúc của bạn đã được gửi riêng tới mình rồi nhé, cảm ơn bạn rất nhiều! ❤️</p>
+        </div>
+      </section>
+
+      <!-- ==========================================================================
+           FOOTER & THÔNG TIN LIÊN HỆ ĐÓN KHÁCH (TỐI GIẢN: SĐT / ZALO & NOTE TÊN)
+           ========================================================================== -->
+      <footer class="card-footer">
+        <div class="footer-hotline-title">Thông tin liên hệ đón khách khi tới cổng</div>
+        
+        <div class="footer-contact-box">
+          <div id="contactPersonNote" class="contact-name-note">
+            Liên hệ: Nguyễn Văn A (0901 234 567)
+          </div>
+          <div class="footer-contact-actions">
+            <!-- Nút gọi điện thoại trực tiếp -->
+            <a id="btnContactPhone" href="tel:0901234567" class="contact-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <span>Gọi điện</span>
+            </a>
+
+            <!-- Nút mở Zalo trực tiếp bằng chính SĐT đó -->
+            <a id="btnContactZalo" href="https://zalo.me/0901234567" target="_blank" rel="noopener noreferrer" class="contact-pill">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.02L5 22l4.3-1.43C10.16 20.8 11.06 21 12 21c5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
+              </svg>
+              <span>Nhắn Zalo</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="closing-message font-script">
+          Rất hân hạnh được đón tiếp bạn!
+        </div>
+
+        <div class="copyright-text">
+          Graduation Celebration © 2026
+        </div>
+      </footer>
+
+    </article>
+  </main>
+
+  <!-- ==========================================================================
+       MEME POPUP (Khi khách bấm trúng nút né tránh troll)
+       ========================================================================== -->
+  <div id="memeModal" class="meme-modal">
+    <div class="meme-card">
+      <div class="meme-icon">🎓😜</div>
+      <h4 class="meme-title font-serif">Bạn nhanh tay quá rồi đấy!</h4>
+      <p class="meme-desc">
+        Bạn đã thử từ chối bất thành! Hệ thống xin phép tự động đổi thành: <strong>Chắc chắn tham gia</strong> nhé! Hẹn gặp bạn ở buổi lễ nhen!
+      </p>
+      <button id="btnMemeOk" type="button" class="btn-meme-ok">
+        Được rồi, mình sẽ tới! 🥰
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="env.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
