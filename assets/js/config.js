@@ -32,8 +32,10 @@ const CONFIG = {
     calendarDetails: "Lễ tốt nghiệp tại Hội trường A5. Liên hệ khi tới nơi: 0901234567"
   },
 
-  // 4. Danh sách ảnh chân dung cử nhân (1 hoặc tối đa 3 ảnh)
+  // 4. Danh sách ảnh chân dung cử nhân (Hỗ trợ nhiều ảnh, có nút lật & tự động trượt)
   photos: [
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop"
   ],
 

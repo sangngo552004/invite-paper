@@ -7,9 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // 1. Phân tích URL Parameters (?to=...&id=...&time=...)
   const urlParams = new URLSearchParams(window.location.search);
   const isPreview = urlParams.get("preview") === "true";
+  const previewMode = urlParams.get("mode") || (isPreview ? "card" : "");
   const rawGuestName = urlParams.get("to");
   const guestId = urlParams.get("id");
   const customTime = urlParams.get("time");
+
+  const isDemo = isPreview || guestId === "demo";
 
   // 2. Tải cấu hình đã lưu (từ localStorage nếu admin đã sửa trên web)
   loadLocalAdminConfig();
@@ -28,8 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let finalGuestName = rawGuestName ? decodeURIComponent(rawGuestName).trim() : "Bạn & Người thương";
   const finalGuestId = guestId || "guest_" + Math.random().toString(36).substring(2, 7);
 
-  // Nếu hệ thống ĐÃ CÓ danh sách khách mời và KHÔNG phải màn hình Admin Preview:
-  if (!isPreview && authorizedList && authorizedList.length > 0) {
+  // Nếu hệ thống ĐÃ CÓ danh sách khách mời và KHÔNG phải màn hình Demo / Preview:
+  if (!isDemo && authorizedList && authorizedList.length > 0) {
     const validGuest = guestId ? authorizedList.find(g => g.id === guestId) : null;
 
     if (!validGuest) {
@@ -61,8 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initRsvpHandler(finalGuestName, finalGuestId);
   initWishHandler(finalGuestName, finalGuestId);
 
-  // 5. Nếu ở chế độ Preview (admin preview), tự động mở phong bì để xem ngay nội dung thiệp
-  if (isPreview) {
+  // 5. Nếu ở chế độ Preview (admin preview), chỉ tự động mở phong bì nếu đang ở chế độ xem ruột thiệp (card)
+  if (isPreview && previewMode !== "envelope") {
     const envelopeScreen = document.getElementById("envelopeScreen");
     if (envelopeScreen) envelopeScreen.classList.add("opened");
   }
@@ -631,16 +634,17 @@ function initRunawayButton() {
     runawayBtn.style.top = `${newTop}px`;
   };
 
-  runawayBtn.addEventListener("mouseenter", dodge);
-
-  runawayBtn.addEventListener("touchstart", (e) => {
-    dodge(e);
-  }, { passive: false });
-
+  // Chỉ né tránh và chạy nhảy khi người dùng THẬT SỰ NHẤN (click) vào nút
   runawayBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    if (memeModal) {
-      memeModal.classList.add("active");
+    e.stopPropagation();
+    dodge(e);
+
+    // Sau khi nhấn né 3 lần trở lên thì hiển thị popup meme vui nhộn
+    if (dodgeCount >= 3 && memeModal) {
+      setTimeout(() => {
+        memeModal.classList.add("active");
+      }, 350);
     }
   });
 

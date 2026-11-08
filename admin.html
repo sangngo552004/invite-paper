@@ -828,10 +828,8 @@ Hoàng Long"></textarea>
       document.getElementById("editContactPhone").value = cfg.contact.phone || "";
       document.getElementById("editContactPerson").value = cfg.contact.personName || "";
 
-      // Load danh sách ảnh động (bao nhiêu ảnh cũng được)
-      const photos = (cfg.photos && cfg.photos.length) ? cfg.photos : [
-        "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000"
-      ];
+      // Load danh sách ảnh động (Mặc định 3 ảnh nếu chưa có cấu hình)
+      const photos = (cfg.photos && cfg.photos.length) ? cfg.photos : CONFIG.photos;
       renderDynamicPhotoSlots(photos);
 
       const audioUrlInput = document.getElementById("editAudioUrl");
@@ -992,10 +990,26 @@ Hoàng Long"></textarea>
             const audioPreview = document.getElementById("adminAudioPreview");
             if (audioPreview) audioPreview.src = normalizeDriveUrl(remote.music_url);
           }
+          let localDraftPhotos = [];
+          try {
+            const saved = localStorage.getItem("invitation_admin_config");
+            if (saved) {
+              const parsed = JSON.parse(saved);
+              if (parsed.photos && parsed.photos.length) localDraftPhotos = parsed.photos;
+            }
+          } catch(e) {}
+
+          let remotePhotosList = [];
           if (remote.photo_urls) {
-            const photos = remote.photo_urls.split(",").map(u => u.trim()).filter(Boolean);
-            if (photos.length) renderDynamicPhotoSlots(photos);
+            remotePhotosList = remote.photo_urls.split(",").map(u => u.trim()).filter(Boolean);
           }
+
+          // Bảo vệ ảnh: Nếu trên máy người dùng đang có 3 ảnh (hoặc nhiều hơn trên Sheet), giữ nguyên ảnh của người dùng!
+          let finalPhotos = (localDraftPhotos.length >= remotePhotosList.length && localDraftPhotos.length > 0)
+            ? localDraftPhotos
+            : (remotePhotosList.length ? remotePhotosList : CONFIG.photos);
+
+          renderDynamicPhotoSlots(finalPhotos);
 
           // Lưu đệm vào localStorage hiện tại
           localStorage.setItem("invitation_admin_config", JSON.stringify(collectFormConfig()));
@@ -1107,8 +1121,7 @@ Hoàng Long"></textarea>
     function refreshPreview() {
       const iframe = document.getElementById("previewIframe");
       if (iframe) {
-        const previewParam = currentPreviewMode === "card" ? "&preview=true" : "";
-        iframe.src = `index.html?to=Xem+Trước&id=demo${previewParam}&t=${Date.now()}`;
+        iframe.src = `index.html?to=Bạn+Thân+Yêu&id=demo&preview=true&mode=${currentPreviewMode}&t=${Date.now()}`;
       }
     }
 
