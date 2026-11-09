@@ -3,6 +3,29 @@
  * Luxury Pastel Blue / Arch Editorial Edition
  */
 
+let hasCachedConfig = false;
+let isRemoteConfigReady = false;
+let remoteConfigPromise = null;
+let remoteSyncPromise = null;
+let guestCustomTimeOverride = null;
+
+// Khởi chạy tải dữ liệu từ Google Sheets ngay lập tức khi nạp script (trước cả DOMContentLoaded)
+// để giảm tối đa độ trễ mạng trên điện thoại di động.
+if (typeof CONFIG !== "undefined" && CONFIG.googleSheetScriptUrl) {
+  remoteConfigPromise = fetchRemoteSheetDataEarly();
+}
+
+async function fetchRemoteSheetDataEarly() {
+  try {
+    const fetchUrl = `${CONFIG.googleSheetScriptUrl}?action=getConfig&t=${Date.now()}`;
+    const response = await fetch(fetchUrl);
+    return await response.json();
+  } catch (err) {
+    console.warn("Không thể tải sớm cấu hình từ Google Sheets:", err);
+    return null;
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // 1. Phân tích URL Parameters (?to=...&id=...&time=...)
   const urlParams = new URLSearchParams(window.location.search);
@@ -14,9 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const isDemo = isPreview || guestId === "demo";
 
-  // 2. Tải cấu hình đã lưu (từ localStorage nếu admin đã sửa trên web)
-  loadLocalAdminConfig();
-  applyConfigData(CONFIG);
+  // 2. Tải cấu hình đã lưu (từ localStorage nếu có cache hoặc admin đã sửa)
+  hasCachedConfig = loadLocalAdminConfig();
 
   // 3. KIỂM TRA BẢO MẬT KHÁCH MỜI (Guest Whitelist Verification)
   let authorizedList = [];
@@ -49,9 +71,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Dùng tên và giờ đã được lưu theo mã ID
     finalGuestName = validGuest.name;
-    if (validGuest.time) CONFIG.ceremony.time = validGuest.time;
+    if (validGuest.time) {
+      guestCustomTimeOverride = validGuest.time;
+      CONFIG.ceremony.time = validGuest.time;
+    }
   } else if (customTime) {
-    CONFIG.ceremony.time = decodeURIComponent(customTime).trim();
+    guestCustomTimeOverride = decodeURIComponent(customTime).trim();
+    CONFIG.ceremony.time = guestCustomTimeOverride;
+  }
+
+  // Chỉ áp dụng ngay CONFIG nếu đã có dữ liệu thật trong bộ nhớ đệm (hoặc không dùng Google Sheet).
+  // Tránh việc trên điện thoại lần đầu mở bị nháy tên mặc định "Nguyễn Hà Minh Khánh" và ảnh mẫu.
+  if (hasCachedConfig || !CONFIG.googleSheetScriptUrl || isPreview) {
+    applyConfigData(CONFIG);
+    isRemoteConfigReady = true;
   }
 
   // 4. Khởi tạo giao diện
@@ -86,22 +119,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 7. Tải cấu hình từ Google Sheets nếu có cài đặt
-  loadRemoteConfigIfAvailable();
+  remoteSyncPromise = loadRemoteConfigIfAvailable();
 });
 
 /**
- * Đọc cấu hình từ localStorage nếu admin đã từng chỉnh sửa trên Admin Preview
+ * Đọc cấu hình từ localStorage nếu có cache từ Google Sheets hoặc Admin Preview
  */
 function loadLocalAdminConfig() {
+  let loadedAny = false;
   try {
+    // Ưu tiên đọc bản cache từ Google Sheets trên thiết bị của khách
+    const cachedSheetConfig = localStorage.getItem("invitation_sheet_cache");
+    if (cachedSheetConfig) {
+      mergeConfig(JSON.parse(cachedSheetConfig));
+      loadedAny = true;
+    }
+    // Nếu trên máy Admin có cấu hình chỉnh sửa trực tiếp thì đè lên
     const savedConfig = localStorage.getItem("invitation_admin_config");
     if (savedConfig) {
-      const parsed = JSON.parse(savedConfig);
-      mergeConfig(parsed);
+      mergeConfig(JSON.parse(savedConfig));
+      loadedAny = true;
     }
   } catch (e) {
     console.warn("Không thể đọc cấu hình từ localStorage:", e);
   }
+  return loadedAny;
 }
 
 /**
@@ -170,15 +212,16 @@ function normalizeDriveUrl(url) {
 async function loadRemoteConfigIfAvailable() {
   if (!CONFIG.googleSheetScriptUrl) {
     applyConfigData(CONFIG);
+    isRemoteConfigReady = true;
     return;
   }
 
   try {
-    const fetchUrl = `${CONFIG.googleSheetScriptUrl}?action=getConfig&t=${Date.now()}`;
-    const response = await fetch(fetchUrl);
-    const json = await response.json();
+    const json = remoteConfigPromise
+      ? await remoteConfigPromise
+      : await fetchRemoteSheetDataEarly();
 
-    if (json.status === "success" && json.data) {
+    if (json && json.status === "success" && json.data) {
       const remote = json.data;
 
       let localCfg = null;
@@ -208,7 +251,7 @@ async function loadRemoteConfigIfAvailable() {
         CONFIG.ceremony.dateTime = getVal(remote.ceremony_date, localCfg?.ceremony?.dateTime, "2026-11-20T08:30:00");
       }
       const sheetTime = remote.time || remote.ceremony_time;
-      if (sheetTime) {
+      if (sheetTime && !guestCustomTimeOverride) {
         CONFIG.ceremony.time = getVal(sheetTime, localCfg?.ceremony?.time, "08:30");
       }
       if (remote.venue_name) {
@@ -237,6 +280,22 @@ async function loadRemoteConfigIfAvailable() {
           }
         } catch (e) { }
       }
+      if (remote.timeline_json) {
+        try {
+          const parsedTimeline = JSON.parse(remote.timeline_json);
+          if (Array.isArray(parsedTimeline) && parsedTimeline.length > 0) {
+            CONFIG.timeline = parsedTimeline;
+          }
+        } catch (e) { }
+      }
+      if (remote.guests_json) {
+        try {
+          const parsedGuests = JSON.parse(remote.guests_json);
+          if (Array.isArray(parsedGuests)) {
+            localStorage.setItem("invitation_authorized_guests", JSON.stringify(parsedGuests));
+          }
+        } catch (e) { }
+      }
       if (remote.music_url) {
         CONFIG.audio.url = normalizeDriveUrl(remote.music_url);
       }
@@ -247,12 +306,45 @@ async function loadRemoteConfigIfAvailable() {
           CONFIG.photos = remotePhotos;
         }
       }
+
+      // Lưu cache dữ liệu từ Google Sheets vào thiết bị để các lần mở sau hiển thị tức thì (0ms)
+      try {
+        localStorage.setItem("invitation_sheet_cache", JSON.stringify({
+          graduate: CONFIG.graduate,
+          ceremony: CONFIG.ceremony,
+          contacts: CONFIG.contacts,
+          timeline: CONFIG.timeline,
+          audio: CONFIG.audio,
+          photos: CONFIG.photos
+        }));
+      } catch (e) { }
+
+      // Tải trước các ảnh chính vào bộ nhớ đệm ngay khi khách đang ở màn hình phong bì
+      preloadPhotos(CONFIG.photos);
     }
   } catch (err) {
     console.warn("Không thể tải cấu hình từ Google Sheets, dùng dữ liệu hiện tại:", err);
   }
 
+  if (guestCustomTimeOverride) {
+    CONFIG.ceremony.time = guestCustomTimeOverride;
+  }
   applyConfigData(CONFIG);
+  isRemoteConfigReady = true;
+}
+
+/**
+ * Tải trước hình ảnh vào bộ nhớ trình duyệt khi khách đang xem phong bì ngoài
+ */
+function preloadPhotos(photos) {
+  if (!Array.isArray(photos)) return;
+  photos.slice(0, 4).forEach(url => {
+    const cleanUrl = normalizeDriveUrl(url);
+    if (cleanUrl) {
+      const img = new Image();
+      img.src = cleanUrl;
+    }
+  });
 }
 
 /**
@@ -562,16 +654,33 @@ function initEnvelopeOpener() {
   if (!envelopeScreen) return;
 
   let isOpening = false;
-  const openEnvelope = () => {
+  const openEnvelope = async () => {
     if (isOpening) return;
     isOpening = true;
 
-    // Giai đoạn 1: Nắp mở xoay 3D ra phía sau và tấm thiệp trượt lên trên nền kem rõ nét
-    envelopeScreen.classList.add("unsealing");
-
+    // Kích hoạt âm thanh ngay trong sự kiện chạm của người dùng để trình duyệt điện thoại không chặn autoplay
     if (CONFIG.audio.enabled && CONFIG.audio.autoPlayOnOpen) {
       playAudio();
     }
+
+    // Nếu mở trên điện thoại lần đầu tiên và dữ liệu từ Google Sheets đang tải dở,
+    // đợi tối đa 2.5s cho dữ liệu về xong rồi mới rút ruột thiệp lên để không bao giờ bị nháy tên/ảnh mặc định.
+    const pendingSync = remoteSyncPromise || remoteConfigPromise;
+    if (!isRemoteConfigReady && pendingSync) {
+      const openTextEl = envelopeScreen.querySelector(".envelope-open-text");
+      if (openTextEl) openTextEl.textContent = "Đang mở thiệp...";
+      await Promise.race([
+        pendingSync,
+        new Promise(resolve => setTimeout(resolve, 2500))
+      ]);
+      // Đảm bảo dữ liệu đã được áp dụng lên DOM
+      if (!isRemoteConfigReady) {
+        applyConfigData(CONFIG);
+      }
+    }
+
+    // Giai đoạn 1: Nắp mở xoay 3D ra phía sau và tấm thiệp trượt lên trên nền kem rõ nét
+    envelopeScreen.classList.add("unsealing");
 
     // Giai đoạn 2: Chuyển cảnh mượt mà vào nội dung thiệp chính và tung pháo giấy
     setTimeout(() => {
