@@ -1,43 +1,49 @@
 /* ==========================================================================
-   MINIMALIST BOTANICAL / LIGHT SAGE GREEN GRADUATION INVITATION STYLES
+   GRADUATION INVITATION - BURGUNDY & FINE ART PAPER LUXURY EDITION
+   Thiết kế dạng Landing Page chuẩn mẫu Canva Editorial với kiến trúc Xếp Lớp (Overlapping Sections)
+   Hệ thống font: Playfair Display + Cormorant Garamond + Alex Brush / Dancing Script + Montserrat
    ========================================================================== */
 
 :root {
-  /* Tông màu XANH NHẠT (Light Sage Green / Soft Matcha) chủ đạo */
-  --bg-sage-light: #F2F6F3;
-  --bg-sage-tint: #EBF2ED;
-  --bg-sage-subtle: #DFEAE3;
-  --bg-card: #FAFBF9;
-  --bg-card-pure: #FFFFFF;
-  
-  /* Primary Soft Sage (Nhẹ nhàng, thanh lịch, không bị tối sẫm) */
-  --primary-sage: #557A66;
-  --primary-sage-hover: #466755;
-  --primary-sage-light: #709480;
-  --primary-sage-soft: #8BAAA0;
-  --primary-sage-badge: #E3ECE6;
-  
-  /* Accent Champagne Gold (Vàng nhạt trang nhã) */
-  --accent-gold: #CDB375;
-  --accent-gold-light: #F7F1DF;
-  --accent-gold-dark: #A88D4E;
-  
+  /* Tông màu ĐỎ RƯỢU VANG QUÝ PHÁI (Burgundy / Wine Red chuẩn mẫu Canva) */
+  --primary-red: #6E1723;
+  --primary-red-hover: #56101B;
+  --primary-red-dark: #420A14;
+  --primary-red-light: #8A2534;
+  --primary-red-gradient: linear-gradient(180deg, #741926 0%, #5E121D 100%);
+  --primary-red-soft: #F4E6E8;
+  --primary-red-tint: #FCF7F7;
+
+  /* Accent Gold (Vàng Champagne / Vàng Kim Sáp Hoàng Gia) */
+  --accent-gold: #D4AF6A;
+  --accent-gold-dark: #9F762B;
+  --accent-gold-light: #FBF5E6;
+
+  /* Nền và Bề mặt - Tone Giấy Mỹ Thuật / Fine Art Paper Ivory Cream */
+  --bg-page: #EDE6DF;
+  --bg-card: #FAF7F2;
+  --bg-surface-white: #FFFFFF;
+
   /* Typography Text Colors */
-  --text-primary: #2C3831;
-  --text-muted: #6B7C72;
-  --text-gold: #A88D4E;
-  
-  /* Borders & Shadows */
-  --border-soft: rgba(85, 122, 102, 0.16);
-  --border-gold: rgba(205, 179, 117, 0.35);
-  --shadow-card: 0 16px 40px -12px rgba(85, 122, 102, 0.12), 0 2px 6px rgba(0,0,0,0.02);
-  --shadow-hover: 0 20px 45px -10px rgba(85, 122, 102, 0.18);
-  --radius-card: 26px;
-  --radius-arch: 160px 160px 24px 24px;
+  --text-main: #2B1619;
+  --text-muted: #685053;
+  --text-light: #947E81;
+  --text-white: #FFFFFF;
+
+  /* Viền và Đường phân tách mỏng tinh xảo */
+  --border-line: rgba(110, 23, 35, 0.22);
+  --border-subtle: rgba(110, 23, 35, 0.09);
+
+  /* Bo góc vòm cung kiến trúc (Arch Dome & Cutout Radius) */
+  --radius-pill: 999px;
 }
 
-/* Reset & Base */
-*, *::before, *::after {
+/* ==========================================================================
+   RESET & LOẠI BỎ HOÀN TOÀN THANH SCROLL PHỤ TRONG THIỆP
+   ========================================================================== */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -46,1458 +52,2070 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  background-color: var(--bg-page);
+  overflow-x: hidden;
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-sage-light);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(205, 179, 117, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(139, 170, 160, 0.12) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.6) 0px, transparent 100%);
-  color: var(--text-primary);
+  font-family: 'Playfair Display', Georgia, serif;
+  background-color: var(--bg-page);
+  /* Vân giấy mỹ thuật mịn tinh tế */
+  background-image:
+    radial-gradient(rgba(110, 23, 35, 0.03) 1px, transparent 0),
+    radial-gradient(rgba(212, 175, 106, 0.04) 1px, transparent 0);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+  color: var(--text-main);
   line-height: 1.6;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* Dùng clip thay vì hidden trên body để tuyệt đối không tạo scroll container thứ 2 */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Typography Helpers */
-.font-serif {
-  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+/* Tùy chỉnh thanh cuộn trình duyệt mảnh mai sang trọng */
+::-webkit-scrollbar {
+  width: 5px;
 }
 
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(110, 23, 35, 0.35);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-red);
+}
+
+/* Ẩn hoàn toàn thanh scroll khi hiển thị trong khung điện thoại Preview */
+html.is-iframe-preview {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html.is-iframe-preview::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+/* FONT CHỮ THƯ PHÁP / CHỮ KÝ */
 .font-script {
-  font-family: 'Dancing Script', 'Alex Brush', cursive;
+  font-family: 'Alex Brush', 'Dancing Script', cursive;
+  font-weight: 400;
+  font-style: normal;
 }
 
-/* Botanical Background Decor */
-.botanical-bg-leaves {
+/* ==========================================================================
+   AMBIENT CANVAS (HẠT BỤI VÀNG KIM & CÁNH HOA BAY)
+   ========================================================================== */
+.ambient-canvas {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 0;
+  z-index: 60;
+}
+
+/* ==========================================================================
+   SCROLL REVEAL ANIMATIONS (ĐA HƯỚNG MƯỢT MÀ, KHÔNG GÂY TRÀN KHUNG)
+   ========================================================================== */
+.anim-on-scroll {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.anim-up {
+  transform: translateY(34px);
+}
+
+.anim-scale {
+  transform: scale(0.93) translateY(20px);
+}
+
+.anim-left {
+  transform: translateX(-32px);
+}
+
+.anim-right {
+  transform: translateX(32px);
+}
+
+.anim-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+  filter: blur(0);
+}
+
+.delay-1 {
+  transition-delay: 0.14s;
+}
+
+.delay-2 {
+  transition-delay: 0.28s;
+}
+
+/* Hiệu ứng ánh kim chạy qua nút bấm (Luxury Gold Shimmer) */
+.btn-shimmer {
+  position: relative;
   overflow: hidden;
-  opacity: 0.28;
 }
 
-.leaf-top-left {
+.btn-shimmer::after {
+  content: "";
   position: absolute;
-  top: -60px;
-  left: -60px;
-  width: 260px;
-  height: 260px;
-  transform: rotate(-15deg);
+  top: 0;
+  left: -120%;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: shimmerSweep 3.8s infinite ease-in-out;
+  pointer-events: none;
 }
 
-.leaf-bottom-right {
-  position: absolute;
-  bottom: -60px;
-  right: -60px;
-  width: 280px;
-  height: 280px;
-  transform: rotate(195deg);
+@keyframes shimmerSweep {
+  0%, 40% {
+    left: -120%;
+  }
+  85%, 100% {
+    left: 160%;
+  }
 }
 
-/* Floating Audio Toggle */
+/* ==========================================================================
+   NÚT BẬT / TẮT NHẠC NỀN DẠNG ĐĨA THAN HOÀNG GIA + NỐT NHẠC BAY
+   ========================================================================== */
 .music-toggle {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  right: 22px;
   z-index: 99;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--bg-card-pure);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
   border: 1.5px solid var(--accent-gold);
-  color: var(--primary-sage);
+  color: var(--primary-red);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(85, 122, 102, 0.15);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 10px 26px rgba(110, 23, 35, 0.25);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+  padding: 0;
 }
 
 .music-toggle:hover {
   transform: scale(1.1);
-  background: #FFF;
+  box-shadow: 0 14px 32px rgba(110, 23, 35, 0.38);
+}
+
+.music-disc-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.music-toggle.playing .music-disc-inner {
+  animation: rotateVinyl 4.2s linear infinite;
 }
 
 .music-toggle.playing {
-  animation: rotateDisc 6s linear infinite;
-  box-shadow: 0 0 0 5px rgba(205, 179, 117, 0.25);
+  box-shadow: 0 0 0 5px rgba(212, 175, 106, 0.32), 0 10px 28px rgba(110, 23, 35, 0.35);
 }
 
-@keyframes rotateDisc {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.music-notes-floating {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.music-toggle.playing .music-notes-floating {
+  opacity: 1;
+}
+
+.music-notes-floating i {
+  position: absolute;
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--primary-red);
+  animation: floatNote 2.4s infinite ease-out;
+  opacity: 0;
+}
+
+.music-notes-floating i:nth-child(1) {
+  left: -12px;
+  animation-delay: 0s;
+}
+
+.music-notes-floating i:nth-child(2) {
+  left: 6px;
+  animation-delay: 1.2s;
+}
+
+@keyframes floatNote {
+  0% {
+    transform: translateY(0) scale(0.7) rotate(-10deg);
+    opacity: 0;
+  }
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(-34px) scale(1.15) rotate(15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes rotateVinyl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================
-   ENVELOPE SCREEN (Opening Experience - Tông Xanh Nhạt Pastel)
+   MÀN HÌNH CHẶN LINK LẠ (SECURITY SCREEN)
+   ========================================================================== */
+.unauthorized-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(36, 14, 18, 0.96);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.unauthorized-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  max-width: 400px;
+  padding: 38px 26px;
+  text-align: center;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* ==========================================================================
+   MÀN HÌNH MỞ PHONG BÌ (ENVELOPE SCREEN)
+   Khớp chuẩn thiết kế draft/image.png + Hiệu ứng rút thiệp 3D
    ========================================================================== */
 .envelope-screen {
   position: fixed;
   inset: 0;
-  background: rgba(90, 118, 103, 0.88);
-  backdrop-filter: blur(10px);
+  background-color: #FAF7F2;
+  background-image:
+    radial-gradient(rgba(110, 23, 35, 0.04) 1px, transparent 0),
+    radial-gradient(rgba(43, 22, 25, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
   z-index: 999;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  transition: opacity 0.8s ease, visibility 0.8s ease;
+  padding: 24px 16px;
+  transition: opacity 0.95s cubic-bezier(0.4, 0, 0.2, 1), transform 0.95s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.95s;
+  perspective: 1400px;
 }
 
 .envelope-screen.opened {
   opacity: 0;
+  transform: scale(1.06);
   visibility: hidden;
   pointer-events: none;
 }
 
-.envelope-container {
+.envelope-wrapper {
   width: 100%;
-  max-width: 420px;
-  perspective: 1000px;
+  max-width: 360px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
-.envelope-body {
+.envelope-header-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.envelope-header-guest {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.05rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--primary-red);
+  line-height: 1.3;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+  padding: 0 12px;
+  text-shadow: 0 2px 10px rgba(110, 23, 35, 0.08);
+}
+
+.envelope-guest-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 160px;
+  margin: 0 auto 24px auto;
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+}
+
+.envelope-guest-divider::before,
+.envelope-guest-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+}
+
+.envelope-header-subtitle,
+.envelope-header-guest,
+.envelope-guest-divider,
+.envelope-hint-arrow {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.envelope-screen.unsealing .envelope-header-subtitle,
+.envelope-screen.unsealing .envelope-header-guest,
+.envelope-screen.unsealing .envelope-guest-divider,
+.envelope-screen.unsealing .envelope-hint-arrow {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Thân Phong Bì 3D Chuẩn Mẫu Canva (Mượt 60fps, đúng thứ tự lớp z-index) */
+.envelope-real {
   position: relative;
   width: 100%;
-  height: 280px;
-  background: linear-gradient(145deg, #B5CCBE, #9EB9A9);
-  border-radius: 16px;
-  box-shadow: 0 25px 45px -10px rgba(35, 55, 45, 0.35);
-  border: 1.5px solid rgba(255, 255, 255, 0.5);
-  display: block;
-  overflow: hidden;
+  max-width: 300px;
+  height: 200px;
+  background: #61141F;
+  border-radius: 4px;
+  box-shadow:
+    0 24px 50px -12px rgba(42, 6, 12, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  transition: transform 0.4s ease;
+  overflow: visible;
+  perspective: 1000px;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.envelope-body:hover {
-  transform: translateY(-4px);
+.envelope-real:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 58px -12px rgba(42, 6, 12, 0.52);
 }
 
-.envelope-belly-band {
+.envelope-base {
   position: absolute;
-  bottom: 22px;
-  left: 0;
-  width: 100%;
-  background: rgba(253, 254, 253, 0.96);
-  padding: 16px 16px 18px 16px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(70, 95, 80, 0.15);
-  border-top: 1.5px solid var(--accent-gold);
-  border-bottom: 1.5px solid var(--accent-gold);
+  inset: 0;
+  border-radius: 4px;
+  background: linear-gradient(160deg, #4E0D17 0%, #38070F 100%);
+  z-index: 1;
+}
+
+/* Tấm thiệp bên trong phong bì (Nằm trên nắp sau khi mở, dưới túi trước) */
+.envelope-inner-card {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 12px;
+  height: 170px;
+  background: #FFFCF9;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
   z-index: 2;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.18s;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
 }
 
-.envelope-to-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
+.inner-card-border {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(212, 175, 106, 0.75);
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 16px 10px 10px 10px;
+  background: linear-gradient(180deg, #FFFDF9 0%, #FAF3EB 100%);
 }
 
-.envelope-guest-name {
-  font-size: 1.6rem;
-  color: var(--primary-sage);
+.inner-card-tag {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.62rem;
+  letter-spacing: 2.5px;
+  color: var(--accent-gold-dark);
   font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.inner-card-name {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--primary-red);
   line-height: 1.25;
 }
 
-/* Wax Seal Button (Vàng Nhạt) - Đặt ở phần nắp trên phong bì */
-.wax-seal {
-  position: absolute;
-  top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #FBF0CC 0%, #E2C983 40%, #B8974E 80%, #8C6F2F 100%);
-  box-shadow: 
-    0 6px 18px rgba(60, 80, 70, 0.3),
-    inset 0 2px 4px rgba(255, 255, 255, 0.7),
-    inset 0 -2px 5px rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.6);
-  animation: pulseWax 2s infinite ease-in-out;
-  transition: transform 0.3s ease;
+.inner-card-line {
+  width: 44px;
+  height: 1.5px;
+  background: var(--accent-gold);
+  margin-top: 10px;
 }
 
-.wax-seal:hover {
-  transform: translateX(-50%) scale(1.08);
+.envelope-screen.unsealing .envelope-inner-card {
+  transform: translate3d(0, -96px, 0);
 }
 
-.wax-seal-initials {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  font-size: 1.45rem;
-  color: #4D3C15;
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.6), -1px -1px 1px rgba(0, 0, 0, 0.3);
-  letter-spacing: 1px;
-}
-
-@keyframes pulseWax {
-  0%, 100% {
-    transform: translateX(-50%) scale(1);
-    box-shadow: 0 6px 18px rgba(60, 80, 70, 0.3), 0 0 0 0 rgba(205, 179, 117, 0.4);
-  }
-  50% {
-    transform: translateX(-50%) scale(1.03);
-    box-shadow: 0 6px 20px rgba(60, 80, 70, 0.35), 0 0 0 12px rgba(205, 179, 117, 0);
-  }
-}
-
-.envelope-prompt {
-  margin-top: 22px;
-  color: #FFFFFF;
-  font-size: 0.95rem;
-  letter-spacing: 1px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 0.95;
-  animation: bounceHint 1.8s infinite ease-in-out;
-}
-
-@keyframes bounceHint {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(5px); }
-}
-
-/* ==========================================================================
-   MAIN INVITATION CARD (Container)
-   ========================================================================== */
-.main-wrapper {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  max-width: 620px;
-  margin: 0 auto;
-  padding: 26px 16px 80px 16px;
-}
-
-.invitation-card {
-  background: var(--bg-card);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border-gold);
-  box-shadow: var(--shadow-card);
-  padding: 38px 22px;
-  position: relative;
-  overflow: hidden;
-}
-
-@media (min-width: 640px) {
-  .invitation-card {
-    padding: 52px 42px;
-  }
-}
-
-/* Subtle Card Inner Border */
-.invitation-card::after {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  border: 1px dashed rgba(205, 179, 117, 0.45);
-  border-radius: calc(var(--radius-card) - 6px);
-  pointer-events: none;
-}
-
-/* Top Botanical Ribbon & Monogram */
-.card-header-badge {
-  text-align: center;
-  margin-bottom: 22px;
-}
-
-.botanical-icon {
-  width: 42px;
-  height: 42px;
-  margin: 0 auto 8px auto;
-  display: block;
-  fill: var(--accent-gold);
-}
-
-.sub-header-tag {
-  font-size: 0.75rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--accent-gold-dark);
-  font-weight: 600;
-  display: block;
-}
-
-.main-invitation-title {
-  font-size: 1.85rem;
-  color: var(--primary-sage);
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-top: 4px;
-  line-height: 1.3;
-}
-
-/* Hero Portrait Frame (To ngang bằng component Thân gửi bên dưới, Tỉ lệ 1:1 vuông bo góc) */
-.photo-arch-container, .photo-square-container {
-  width: 100%;
-  max-width: 100%;
-  aspect-ratio: 1 / 1;
-  height: auto;
-  margin: 28px auto 38px auto;
-  border-radius: 28px;
-  padding: 8px;
-  background: linear-gradient(135deg, var(--accent-gold-light), var(--accent-gold), var(--accent-gold-dark));
-  box-shadow: 0 24px 50px -12px rgba(85, 122, 102, 0.3);
-  position: relative;
-  box-sizing: border-box;
-}
-
-@media (max-width: 520px) {
-  .photo-arch-container, .photo-square-container {
-    width: 100%;
-    max-width: 100%;
-    aspect-ratio: 1 / 1;
-    height: auto;
-    margin: 22px auto 34px auto;
-    border-radius: 24px;
-    padding: 7px;
-  }
-}
-
-.photo-arch-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #EAEFEA;
-  position: relative;
-}
-
-.photo-arch-inner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: opacity 0.6s ease-in-out;
-}
-
-.photo-arch-inner img.slider-item {
+/* Cánh gập 2 bên hông phong bì */
+.envelope-flap-sides {
   position: absolute;
   inset: 0;
-  opacity: 0;
+  z-index: 3;
   pointer-events: none;
 }
 
-.photo-arch-inner img.slider-item.active {
-  opacity: 1;
-  pointer-events: auto;
+.envelope-flap-sides::before,
+.envelope-flap-sides::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52%;
 }
 
-/* Nút Lật Ảnh Previous / Next - Nằm bên cạnh ngoài khung ảnh, trong suốt mờ ảo tinh tế */
-.photo-nav-btn {
+.envelope-flap-sides::before {
+  left: 0;
+  background: linear-gradient(135deg, #6B1723 0%, #54101A 100%);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.envelope-flap-sides::after {
+  right: 0;
+  background: linear-gradient(225deg, #671521 0%, #500E18 100%);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+/* Túi tam giác phía dưới */
+.envelope-pocket-bottom {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1.5px solid rgba(255, 255, 255, 0.8);
-  color: #2F4F3E;
-  font-size: 1.8rem;
-  font-weight: 300;
-  line-height: 1;
+  inset: 0;
+  clip-path: polygon(0 100%, 50% 44%, 100% 100%);
+  background: linear-gradient(180deg, #701926 0%, #520F19 100%);
+  border-radius: 0 0 4px 4px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Nắp gập tam giác phía trên - Khi mở sẽ lật ra sau tấm thiệp (z-index: 1) */
+.envelope-flap-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 116px;
+  background: linear-gradient(180deg, #7A1D2B 0%, #5E131E 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 5;
+  will-change: transform;
+  transform-origin: top center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), z-index 0s linear 0.15s;
+  pointer-events: none;
+}
+
+.envelope-screen.unsealing .envelope-flap-top {
+  transform: rotateX(180deg);
+  background: linear-gradient(180deg, #4E0D17 0%, #631521 100%);
+  z-index: 1;
+}
+
+/* Nhành hoa Calla Lily (Hoa Rum Trắng) góc dưới phải chuẩn mẫu draft/image.png */
+.envelope-calla-lily {
+  position: absolute;
+  right: -34px;
+  bottom: -26px;
+  width: 126px;
+  height: 175px;
+  pointer-events: none;
+  z-index: 6;
+  filter: drop-shadow(2px 6px 10px rgba(0, 0, 0, 0.25));
+  transform-origin: bottom left;
+  animation: lilyBreeze 4.5s infinite ease-in-out;
+}
+
+@keyframes lilyBreeze {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(2.5deg) translateY(-2px);
+  }
+}
+
+/* Con Dấu Sáp Vàng Hoàng Gia Dáng Tự Nhiên (Organic Oval Wax Seal) */
+.envelope-wax-seal {
+  position: absolute;
+  top: 112px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 7;
+  width: 48px;
+  height: 54px;
+  cursor: pointer;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  animation: sealPulse 2.8s infinite ease-in-out;
+}
+
+.wax-seal-organic {
+  width: 100%;
+  height: 100%;
+  border-radius: 47% 53% 51% 49% / 44% 48% 52% 56%;
+  background: radial-gradient(circle at 35% 30%, #F9E5B9 0%, #D9B166 42%, #B28438 78%, #7E5617 100%);
+  box-shadow:
+    0 6px 16px rgba(30, 4, 8, 0.5),
+    inset 0 2px 4px rgba(255, 250, 235, 0.8),
+    inset 0 -3px 6px rgba(65, 38, 5, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 15;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  user-select: none;
-  padding: 0;
+  border: 1px solid rgba(255, 240, 200, 0.65);
 }
 
-.photo-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--primary-sage-hover);
-  transform: translateY(-50%) scale(1.12);
-  box-shadow: 0 8px 24px rgba(85, 122, 102, 0.28);
+.wax-seal-inner-ring {
+  width: 33px;
+  height: 39px;
+  border-radius: 48% 52% 50% 50% / 45% 48% 52% 55%;
+  background: radial-gradient(circle at 35% 35%, #E4BE74 0%, #C29546 65%, #9B6E26 100%);
+  box-shadow:
+    inset 0 2px 5px rgba(60, 35, 5, 0.45),
+    0 1px 2px rgba(255, 245, 215, 0.65);
+  border: 1px solid rgba(130, 88, 24, 0.4);
 }
 
-.photo-nav-prev {
-  left: -20px;
+.envelope-real:hover .envelope-wax-seal {
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
-.photo-nav-next {
-  right: -20px;
+.envelope-screen.unsealing .envelope-wax-seal {
+  transform: translate(-50%, -50%) scale(1.4) rotate(18deg);
+  opacity: 0;
 }
 
-@media (max-width: 440px) {
-  .photo-nav-prev {
-    left: -10px;
+@keyframes sealPulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
   }
-  .photo-nav-next {
-    right: -10px;
+  50% {
+    transform: translate(-50%, -52%) scale(1.04);
   }
 }
 
-/* Chấm tròn phân trang (Dots) - Đặt bên ngoài phía dưới khung ảnh */
-.photo-dots-container {
+.envelope-open-text {
   position: absolute;
-  bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 24px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.94);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.4px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.envelope-hint-arrow {
+  margin-top: 34px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 6px;
-  z-index: 10;
-  background: rgba(85, 122, 102, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 4px 10px;
-  border-radius: 12px;
+  animation: bounceHint 2.2s infinite ease-in-out;
 }
 
-.photo-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(85, 122, 102, 0.4);
-  transition: all 0.25s ease;
-  cursor: pointer;
+@keyframes bounceHint {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
 }
 
-.photo-dot.active {
-  width: 18px;
-  border-radius: 4px;
-  background: var(--primary-sage);
+/* ==========================================================================
+   LANDING PAGE CONTAINER
+   Tuyệt đối không sinh thanh cuộn riêng (overflow: hidden)
+   ========================================================================== */
+.landing-page-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0;
+  background: var(--bg-card);
+  box-shadow: 0 22px 70px rgba(35, 8, 12, 0.15);
+  /* overflow: hidden ngăn hoàn toàn thanh scroll dọc phụ bên trong thiệp */
+  overflow: hidden;
+  position: relative;
 }
 
-/* Greeting Section */
-.guest-greeting-box {
-  background: rgba(235, 242, 237, 0.65);
-  border: 1px solid var(--border-soft);
-  border-left: 4px solid var(--primary-sage-light);
-  border-radius: 12px;
-  padding: 16px 18px;
-  margin: 26px 0;
+.landing-section {
+  width: 100%;
+  position: relative;
+}
+
+/* Hiệu ứng ảnh có chiều sâu mượt mà */
+.parallax-img {
+  will-change: transform;
+  transition: transform 0.15s linear;
+}
+
+/* ==========================================================================
+   SECTION 1: HERO PHOTO (ĐÁY BO VÒM CONG XUỐNG CHUẨN MẪU draft/image copy.png)
+   ========================================================================== */
+.hero-section {
+  background: var(--bg-card);
+  padding: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-photo-arch-mask {
+  width: 100%;
+  aspect-ratio: 3 / 4.25;
+  position: relative;
+  overflow: hidden;
+  background: var(--primary-red-soft);
+  /* Đáy ảnh bo vòm cung tròn xuống dưới để lộ 2 góc kem 2 bên */
+  border-radius: 0 0 50% 50% / 0 0 165px 165px;
+  box-shadow: 0 10px 28px rgba(42, 6, 12, 0.14);
+}
+
+.hero-photo-img {
+  width: 100%;
+  height: 106%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.hero-photo-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  /* Đẩy chữ lên vừa vặn phía trên đỉnh vòm đỏ đô của Section 2 đè lên */
+  padding: 70px 16px 96px 16px;
+  background: linear-gradient(
+    to top,
+    rgba(24, 4, 8, 0.85) 0%,
+    rgba(24, 4, 8, 0.45) 55%,
+    transparent 100%
+  );
+  color: #FFFFFF;
   text-align: center;
 }
 
-.guest-greeting-to {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-}
-
-.guest-name-dynamic {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--primary-sage);
-  display: inline-block;
-  margin-left: 4px;
-}
-
-.guest-greeting-body {
-  font-size: 0.92rem;
-  color: var(--text-primary);
-  margin-top: 6px;
-  font-style: italic;
-}
-
-/* Graduate Name & Degree */
-.graduate-profile {
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.graduate-name {
-  font-size: 1.95rem;
-  font-weight: 700;
-  color: var(--primary-sage);
-  line-height: 1.2;
-}
-
-.degree-title {
-  font-size: 1rem;
-  color: var(--accent-gold-dark);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  margin-top: 4px;
-}
-
-.university-name {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* Countdown Box */
-.countdown-section {
-  margin: 30px 0;
-  text-align: center;
-}
-
-.countdown-title {
-  font-size: 0.78rem;
+.hero-arch-title {
+  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  font-size: 1.65rem;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
+  font-weight: 600;
+  transform: scaleY(1.18);
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
-.countdown-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.hero-arch-date {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================================================
+   SECTION 2: VÒM ĐỎ ĐÔ NỔI - TÊN CỬ NHÂN & COUNTDOWN
+   ĐÈ LÊN ĐÁY SECTION 1 VÀ ĐÈ LÊN ĐỈNH SECTION 3 (Khớp 100% image copy 2 & 3)
+   ========================================================================== */
+.name-countdown-section {
+  background: transparent;
+  padding: 0;
+  position: relative;
+  z-index: 6;
+  /* Đè ngược lên đáy vòm ảnh 1 và đè xuống đỉnh ảnh 2 */
+  margin-top: -82px;
+  margin-bottom: -115px;
+  pointer-events: none;
+}
+
+.name-countdown-inner {
+  pointer-events: auto;
+  width: 82%;
+  margin: 0 auto;
+  background: var(--primary-red-gradient);
+  border-radius: 220px 220px 0 0;
+  padding: 64px 18px 42px 18px;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow:
+    0 -10px 30px rgba(35, 5, 10, 0.24),
+    0 22px 48px rgba(35, 5, 10, 0.38);
+  position: relative;
+}
+
+/* Viền chỉ vàng mảnh tinh tế bên trong vòm */
+.name-countdown-inner::before {
+  content: "";
+  position: absolute;
+  inset: 10px 10px 0 10px;
+  border-radius: 210px 210px 0 0;
+  border: 1px solid rgba(212, 175, 106, 0.25);
+  border-bottom: none;
+  pointer-events: none;
+}
+
+.name-block-subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.96);
+  margin-bottom: 14px;
+}
+
+.graduate-name-script {
+  font-size: 3.45rem;
+  line-height: 1.22;
+  color: #FFFFFF;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.28);
+  margin-bottom: 18px;
+  padding: 0 6px;
+}
+
+.countdown-subtext {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 22px;
+}
+
+/* Đếm ngược thanh lịch hàng ngang */
+.countdown-row-clean {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
   gap: 8px;
-  max-width: 380px;
   margin: 0 auto;
 }
 
 .countdown-unit {
-  background: #FFFFFF;
-  border: 1px solid var(--border-soft);
-  border-radius: 14px;
-  padding: 12px 6px;
-  box-shadow: 0 4px 12px rgba(85, 122, 102, 0.05);
-}
-
-.countdown-number {
-  font-size: 1.55rem;
-  font-weight: 700;
-  color: var(--primary-sage);
-  line-height: 1.1;
-  font-family: 'Playfair Display', serif;
-}
-
-.countdown-label {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
-}
-
-/* ==========================================================================
-   CEREMONY DETAILS CARD
-   ========================================================================== */
-.ceremony-details {
-  background: #FFFFFF;
-  border-radius: 20px;
-  border: 1px solid var(--border-soft);
-  padding: 22px;
-  margin: 30px 0;
-  box-shadow: 0 4px 16px rgba(85, 122, 102, 0.04);
-}
-
-.detail-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px dashed rgba(85, 122, 102, 0.15);
-}
-
-.detail-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.detail-icon-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--bg-sage-tint);
-  color: var(--primary-sage);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.detail-content {
-  flex: 1;
-}
-
-.detail-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.detail-value {
-  font-size: 0.98rem;
-  color: var(--text-primary);
-  font-weight: 600;
-  margin-top: 2px;
-}
-
-.detail-sub {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* Action Buttons (Maps & Calendar) */
-.action-buttons-group {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-@media (min-width: 480px) {
-  .action-buttons-group {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.btn-utility {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.25s ease;
-  cursor: pointer;
-}
-
-.btn-maps {
-  background: var(--bg-sage-tint);
-  color: var(--primary-sage);
-  border: 1px solid var(--border-soft);
-}
-
-.btn-maps:hover {
-  background: var(--bg-sage-subtle);
-  transform: translateY(-2px);
-}
-
-.btn-calendar {
-  background: var(--bg-sage-tint);
-  color: var(--primary-sage);
-  border: 1px solid var(--border-soft);
-}
-
-.btn-calendar:hover {
-  background: var(--bg-sage-subtle);
-  transform: translateY(-2px);
-}
-
-/* ==========================================================================
-   CAMPUS MAP CARD (Sơ đồ trường & Hướng dẫn di chuyển nội bộ)
-   ========================================================================== */
-.campus-map-card {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px dashed var(--border-soft);
-  text-align: left;
-}
-
-.campus-map-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.campus-map-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-sage-tint);
-  color: var(--primary-sage);
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-}
-
-.campus-map-subtitle {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.campus-map-preview-wrap {
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 1px solid var(--border-soft);
-  background: #FAFBF9;
-  box-shadow: 0 4px 14px rgba(85, 122, 102, 0.08);
-  outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.campus-map-preview-wrap:hover,
-.campus-map-preview-wrap:focus-visible {
-  border-color: var(--primary-sage-soft);
-  box-shadow: 0 8px 22px rgba(85, 122, 102, 0.16);
-}
-
-.campus-map-preview-wrap img {
-  width: 100%;
-  max-height: 210px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.4s ease;
-}
-
-.campus-map-preview-wrap:hover img {
-  transform: scale(1.03);
-}
-
-.campus-map-zoom-pill {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(6px);
-  color: var(--primary-sage);
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  pointer-events: none;
-  border: 1px solid rgba(85, 122, 102, 0.15);
-}
-
-.campus-map-note-box {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: var(--bg-sage-tint);
-  border-radius: 12px;
-  border-left: 3px solid var(--primary-sage);
-  text-align: left;
+  align-items: center;
+  min-width: 46px;
 }
 
-.campus-map-note-item {
-  font-size: 0.86rem;
-  color: var(--text-primary);
-  line-height: 1.5;
+.countdown-val {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2.3rem;
+  font-weight: 400;
+  color: #FFFFFF;
+  line-height: 1;
+  letter-spacing: 1px;
 }
 
-.campus-map-note-item + .campus-map-note-item {
-  padding-top: 8px;
-  border-top: 1px dashed rgba(85, 122, 102, 0.22);
-}
-
-.campus-map-note-label {
-  font-weight: 700;
-  color: var(--primary-sage);
-  margin-right: 4px;
-}
-
-.campus-map-note-text {
+.countdown-tag {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 8px;
   font-weight: 500;
 }
 
+.countdown-colon {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.05;
+}
+
 /* ==========================================================================
-   CAMPUS MAP LIGHTBOX MODAL
+   SECTION 3: PORTRAIT PHOTO (ẢNH TOÀN THÂN FULL BLEED NẰM DƯỚI ĐÁY SECTION 2)
+   Khớp chuẩn draft/image copy 2.png & image copy 3.png
    ========================================================================== */
-.campus-map-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-}
-
-.campus-map-modal.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.campus-map-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(20, 32, 26, 0.72);
-  backdrop-filter: blur(5px);
-}
-
-.campus-map-modal-card {
+.portrait-photo-section {
+  background: var(--bg-card);
+  padding: 0;
   position: relative;
   z-index: 1;
-  background: #FFFFFF;
-  border-radius: 20px;
-  max-width: 680px;
+}
+
+.portrait-photo-wrapper {
   width: 100%;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
+  aspect-ratio: 3 / 4.35;
   overflow: hidden;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-  transform: scale(0.92);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: var(--primary-red-soft);
 }
 
-.campus-map-modal.active .campus-map-modal-card {
-  transform: scale(1);
-}
-
-.campus-map-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  background: var(--bg-sage-tint);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.campus-map-modal-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  color: var(--primary-sage);
-  font-size: 1.05rem;
-}
-
-.campus-map-modal-close {
-  background: #FFFFFF;
-  border: 1px solid var(--border-soft);
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  color: var(--text-muted);
-  cursor: pointer;
-  line-height: 1;
-  transition: all 0.2s ease;
-}
-
-.campus-map-modal-close:hover {
-  background: var(--primary-sage);
-  color: #FFFFFF;
-  border-color: var(--primary-sage);
-}
-
-.campus-map-modal-body {
-  overflow-y: auto;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 12px;
-  background: #FAFBF9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-height: calc(90vh - 120px);
-}
-
-.campus-map-modal-body img {
+.portrait-photo-img {
   width: 100%;
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-  border-radius: 10px;
+  height: 106%;
+  object-fit: cover;
+  object-position: center center;
   display: block;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-}
-
-.campus-map-modal-footer {
-  display: flex;
-  flex-direction: column;
-  padding: 12px 18px;
-  background: #FFFFFF;
-  border-top: 1px solid var(--border-soft);
-  font-size: 0.88rem;
-  color: var(--text-primary);
-  text-align: left;
-}
-
-.campus-map-modal-note-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.modal-note-item {
-  line-height: 1.45;
-}
-
-.modal-note-item + .modal-note-item {
-  padding-top: 6px;
-  border-top: 1px dashed rgba(85, 122, 102, 0.18);
-}
-
-.modal-note-label {
-  font-weight: 700;
-  color: var(--primary-sage);
-  margin-right: 4px;
 }
 
 /* ==========================================================================
-   STANDALONE RSVP SECTION
+   SECTION 4: LỜI MỜI & CHI TIẾT BUỔI LỄ (ĐÈ LÊN ĐÁY SECTION 3 & ĐỈNH SECTION 5)
+   Khớp chuẩn thiết kế thanh nhã tại draft/image copy 4.png
    ========================================================================== */
-.rsvp-section {
-  background: linear-gradient(180deg, #F3F7F4 0%, #FFFFFF 100%);
-  border-radius: 20px;
-  border: 1px solid var(--border-soft);
-  padding: 28px 18px;
-  margin: 32px 0;
-  text-align: center;
+.ceremony-section {
   position: relative;
-  overflow: hidden;
+  z-index: 5;
+  margin-top: -36px;
+  margin-bottom: -32px;
 }
 
-.rsvp-badge {
-  display: inline-block;
-  background: var(--primary-sage-badge);
-  color: var(--primary-sage);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 20px;
+.ceremony-arch-card {
+  background: var(--bg-card);
+  border-radius: 36px 36px 32px 32px;
+  padding: 52px 24px 50px 24px;
+  text-align: center;
+  box-shadow:
+    0 -14px 34px rgba(35, 6, 12, 0.12),
+    0 14px 34px rgba(35, 6, 12, 0.12);
+  position: relative;
+  /* Đồng bộ 100% một font chữ duy nhất và chuẩn hóa chữ số thẳng hàng */
+  font-family: 'Playfair Display', Georgia, serif;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+
+.ceremony-content-wrapper {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.ceremony-to-header {
+  margin-bottom: 28px;
+}
+
+.ceremony-lead-text {
+  font-family: inherit;
+  font-size: 0.94rem;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-bottom: 12px;
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: 1.65;
 }
 
-.rsvp-question {
-  font-size: 1.4rem;
-  color: var(--primary-sage);
+/* Khung tôn vinh tên khách mời nổi bật bên trong thiệp */
+.guest-name-spotlight-wrap {
+  margin: 12px auto 14px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.guest-name-spotlight {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 26px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(135deg, #FFFDF9 0%, #F9ECEE 100%);
+  border: 1.5px solid var(--accent-gold);
+  box-shadow:
+    0 8px 22px rgba(110, 23, 35, 0.12),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 1.5rem;
   font-weight: 700;
+  font-style: normal;
+  color: var(--primary-red);
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+}
+
+.guest-name-spotlight::before,
+.guest-name-spotlight::after {
+  content: "✦";
+  font-style: normal;
+  font-size: 0.85rem;
+  color: var(--accent-gold);
+}
+
+.guest-name-highlight,
+.graduate-short-highlight {
+  color: var(--primary-red);
+  font-weight: 700;
+}
+
+/* Bố cục ngày tháng kinh điển chuẩn thiệp cưới/tốt nghiệp */
+.ceremony-date-block {
+  margin: 26px 0 24px 0;
+}
+
+.ceremony-day-txt {
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-main);
   margin-bottom: 8px;
 }
 
-.rsvp-subtext {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  max-width: 440px;
-  margin: 0 auto 22px auto;
-}
-
-/* RSVP Interactive Area */
-.rsvp-buttons-area {
-  position: relative;
-  min-height: 70px;
+.ceremony-date-cols {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
+}
+
+.ceremony-date-wing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+}
+
+.wing-line {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: var(--primary-red);
+  opacity: 0.75;
+}
+
+.wing-label {
+  font-family: inherit;
+  font-size: 1.18rem;
+  color: var(--text-main);
+  font-weight: 600;
+  padding: 7px 0;
+  letter-spacing: 0.3px;
+}
+
+.ceremony-day-big {
+  font-family: inherit;
+  font-size: 4.2rem;
+  font-weight: 700;
+  color: var(--primary-red);
+  line-height: 0.95;
+  padding: 0 4px;
+}
+
+.ceremony-time-txt {
+  font-family: inherit;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-main);
+  margin-top: 12px;
+}
+
+.ceremony-venue-block {
+  margin-top: 14px;
+  margin-bottom: 28px;
+}
+
+.ceremony-venue-lead {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.ceremony-venue-name {
+  font-family: inherit;
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: var(--primary-red);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  line-height: 1.45;
+  margin-bottom: 10px;
+  padding: 0 8px;
+}
+
+.ceremony-venue-address {
+  font-family: inherit;
+  font-size: 0.96rem;
+  color: var(--text-main);
+  line-height: 1.6;
+  font-style: normal;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+/* 3 Nút Hành Động Pill Thanh Lịch Chuẩn Luxury */
+.ceremony-actions-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-/* Button 1: Attend (Soft Sage Green - Nhẹ Nhàng Tươi Sáng) */
-.btn-attend {
-  background: linear-gradient(135deg, #628A74, #507460);
-  color: #FFFFFF;
-  border: none;
-  padding: 13px 26px;
-  border-radius: 30px;
-  font-size: 0.98rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 10px 22px -5px rgba(85, 122, 102, 0.35);
+.btn-action-pill {
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(110, 23, 35, 0.55);
+  color: var(--primary-red);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-action-pill:hover {
+  background: var(--primary-red);
+  color: #FFFFFF;
+  border-color: var(--primary-red);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(110, 23, 35, 0.25);
+}
+
+/* ==========================================================================
+   SECTION 5: TIMELINE (VÒM ĐÁY ARCH BOTTOM TRÊN NỀN ẢNH)
+   Khớp chuẩn draft/image copy 5.png
+   ========================================================================== */
+.timeline-section {
+  background: var(--bg-card);
+  padding: 0;
   position: relative;
   z-index: 2;
 }
 
-.btn-attend:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 12px 25px -4px rgba(85, 122, 102, 0.45);
-}
-
-.btn-attend.confirmed {
-  background: linear-gradient(135deg, #4F936B, #3D7856);
-  pointer-events: none;
-}
-
-/* Button 2: Runaway Troll Button */
-.btn-decline {
-  background: #FFFFFF;
-  color: #83978B;
-  border: 1px solid #D5E2D9;
-  padding: 11px 20px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s, color 0.2s;
-  user-select: none;
-  touch-action: none;
+.timeline-arch-bottom-frame {
   position: relative;
-  z-index: 3;
-  white-space: nowrap;
+  width: 100%;
+  aspect-ratio: 3 / 4.15;
+  overflow: hidden;
+  background: var(--primary-red-soft);
+  border-radius: 0 0 50% 50% / 0 0 190px 190px;
+  box-shadow: 0 14px 32px rgba(45, 6, 12, 0.16);
 }
 
-.btn-decline:hover {
-  background: #FFF5F5;
-  color: #D32F2F;
-  border-color: #FFCDD2;
+.timeline-backdrop-img {
+  width: 100%;
+  height: 106%;
+  object-fit: cover;
+  display: block;
 }
 
-.btn-decline.teleporting {
-  position: fixed !important;
-  z-index: 9999;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
-  transition: top 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease;
+.timeline-arch-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 12, 8, 0.55) 0%,
+    rgba(38, 22, 12, 0.45) 55%,
+    rgba(28, 12, 8, 0.62) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 46px 24px 64px 24px;
+  color: #FFFFFF;
 }
 
-.rsvp-status-message {
-  margin-top: 16px;
+.timeline-title-script {
+  font-size: 3.9rem;
+  color: #FFFFFF;
+  margin-bottom: 28px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.timeline-nodes-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+  width: 100%;
+  max-width: 300px;
+  padding: 12px 0;
+}
+
+.timeline-vertical-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.timeline-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-item-row.reverse {
+  flex-direction: row-reverse;
+}
+
+.timeline-icon-side {
+  width: 115px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.timeline-icon-clean {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+  transition: transform 0.35s ease;
+}
+
+.timeline-item-row:hover .timeline-icon-clean {
+  transform: scale(1.12);
+}
+
+.timeline-center-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.28);
+}
+
+.timeline-text-side {
+  width: 115px;
+  text-align: left;
+}
+
+.timeline-item-row.reverse .timeline-text-side {
+  text-align: left;
+  padding-left: 18px;
+}
+
+.timeline-time-val {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1.25;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.timeline-name-val {
+  font-family: 'Montserrat', sans-serif;
   font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--primary-sage);
-  display: none;
-  animation: fadeIn 0.4s ease-in;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.96);
+  margin-top: 3px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
 /* ==========================================================================
-   STANDALONE PRIVATE WISHES (GUESTBOOK)
+   SECTION 6: LỊCH THÁNG MINI (ÔM SÁT ĐÁY VÒM CONG TIMELINE)
+   Khớp chuẩn draft/image copy 5.png & image copy 6.png
    ========================================================================== */
-.wishes-section {
-  background: #FFFFFF;
-  border-radius: 20px;
-  border: 1px solid var(--border-soft);
-  padding: 28px 20px;
-  margin: 32px 0;
-  box-shadow: 0 4px 16px rgba(85, 122, 102, 0.04);
-}
-
-.wishes-header {
+.calendar-section {
+  background: var(--bg-card);
+  padding: 22px 24px 38px 24px;
   text-align: center;
-  margin-bottom: 20px;
+  position: relative;
+  z-index: 3;
+  margin-top: -10px;
 }
 
-.wishes-badge {
+.calendar-section-inner {
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.calendar-month-title {
+  font-size: 3.6rem;
+  color: #3E1218;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.mini-calendar-table {
+  width: 100%;
+  max-width: 310px;
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.mini-calendar-table th {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  padding: 8px 4px 10px 4px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.mini-calendar-table td {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.02rem;
+  color: var(--text-main);
+  padding: 6px 4px;
+  text-align: center;
+  position: relative;
+  height: 38px;
+}
+
+/* Trái Tim Đỏ Rượu Đập Nhịp Nhàng Ôm Trọn Ngày Lễ */
+.calendar-heart-highlight {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(205, 179, 117, 0.18);
-  color: var(--accent-gold-dark);
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  z-index: 2;
+  animation: heartBeat 1.8s infinite ease-in-out;
+}
+
+.calendar-heart-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: var(--primary-red);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") no-repeat center / contain;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") no-repeat center / contain;
+  z-index: -1;
+  transform: scale(1.22);
+  filter: drop-shadow(0 3px 6px rgba(110, 23, 35, 0.4));
+}
+
+@keyframes heartBeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  18% {
+    transform: scale(1.14);
+  }
+  32% {
+    transform: scale(0.98);
+  }
+  48% {
+    transform: scale(1.08);
+  }
+}
+
+/* ==========================================================================
+   SECTION 7: ALBUM GALLERY (VÒM ĐỎ ĐÔ BAO TRÙM CỐ ĐỊNH 5 ẢNH)
+   Khớp chuẩn draft/image copy 6.png & 7.png (1 ảnh 4:3 trên + 4 ảnh dọc 3:4 dưới)
+   ========================================================================== */
+.gallery-section {
+  background: var(--bg-card);
+  padding: 0;
+  position: relative;
+  z-index: 3;
+}
+
+.gallery-arch-container {
+  width: 100%;
+  background: var(--primary-red-gradient);
+  border-radius: 50% 50% 0 0 / 195px 195px 0 0;
+  /* Padding đáy rộng để Section 8 (RSVP) đè lên trên nền đỏ đô */
+  padding: 50px 18px 92px 18px;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 -10px 28px rgba(45, 6, 12, 0.16);
+}
+
+.gallery-arch-header {
+  margin-bottom: 22px;
+}
+
+.gallery-title-script {
+  font-size: 3.7rem;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+}
+
+.gallery-grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gallery-top-slot {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  cursor: zoom-in;
+}
+
+.gallery-2x2-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.gallery-grid-slot {
+  width: 100%;
+  /* Dáng ảnh dọc 3:4 khớp chuẩn mẫu draft/image copy 7.png */
+  aspect-ratio: 3 / 4;
+  border-radius: 4px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+  cursor: zoom-in;
+}
+
+.gallery-slot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-top-slot:hover .gallery-slot-img,
+.gallery-grid-slot:hover .gallery-slot-img {
+  transform: scale(1.06);
+}
+
+/* ==========================================================================
+   SECTION 8: XÁC NHẬN THAM DỰ RSVP (ĐÈ LÊN ĐÁY NỀN ĐỎ ĐÔ CỦA GALLERY)
+   Khớp chuẩn draft/image copy 8.png
+   ========================================================================== */
+.rsvp-section {
+  position: relative;
+  z-index: 5;
+  margin-top: -58px;
+  padding: 0 16px;
+}
+
+.rsvp-overlapping-card {
+  background: #FFFCF9;
+  border-radius: 26px;
+  padding: 40px 22px 36px 22px;
+  text-align: center;
+  box-shadow: 0 16px 42px rgba(35, 6, 12, 0.15);
+  border: 1px solid rgba(110, 23, 35, 0.1);
+}
+
+.rsvp-content-wrapper {
+  max-width: 370px;
+  margin: 0 auto;
+}
+
+.rsvp-invitation-message {
+  font-size: 0.98rem;
+  color: var(--text-main);
+  line-height: 1.65;
+  margin-bottom: 26px;
+}
+
+.rsvp-form {
+  text-align: left;
+}
+
+.rsvp-form-group {
+  margin-bottom: 18px;
+}
+
+.rsvp-label {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.rsvp-input-clean {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(110, 23, 35, 0.32);
+  background: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.rsvp-input-clean:focus {
+  outline: none;
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgba(110, 23, 35, 0.12);
+}
+
+.rsvp-choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-rsvp-choice {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: #F2E2E4;
+  font-family: inherit;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition: all 0.25s ease;
+}
+
+.btn-rsvp-choice:hover,
+.btn-rsvp-choice.selected {
+  background: #EAD0D3;
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+  font-weight: 600;
+}
+
+.btn-rsvp-choice.selected .choice-checkbox {
+  background: var(--primary-red);
+  color: #FFFFFF;
+  border-color: var(--primary-red);
+}
+
+.choice-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(110, 23, 35, 0.45);
+  background: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  color: transparent;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.btn-submit-rsvp-burgundy {
+  width: 100%;
+  padding: 13px 24px;
+  border-radius: var(--radius-pill);
+  background: var(--primary-red);
+  color: #FFFFFF;
+  border: none;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(110, 23, 35, 0.3);
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.btn-submit-rsvp-burgundy:hover {
+  background: var(--primary-red-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(110, 23, 35, 0.4);
+}
+
+.rsvp-status-message {
+  display: none;
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: #2E7D32;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ==========================================================================
+   SECTION 9: GỬI LỜI CHÚC MỪNG (SỔ LƯU BÚT NỔI ĐÈ LÊN TRÊN FOOTER)
+   ========================================================================== */
+.wishes-section {
+  position: relative;
+  z-index: 5;
+  padding: 24px 16px 0 16px;
+  margin-bottom: -60px;
+}
+
+.wishes-overlapping-card {
+  background: #FFFCF9;
+  border-radius: 26px;
+  padding: 34px 22px 36px 22px;
+  text-align: center;
+  box-shadow: 0 18px 46px rgba(30, 5, 10, 0.22);
+  border: 1px solid rgba(212, 175, 106, 0.38);
+}
+
+.wishes-content-wrapper {
+  max-width: 370px;
+  margin: 0 auto;
+}
+
+.wishes-ornament {
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+  margin-bottom: 4px;
 }
 
 .wishes-title {
-  font-size: 1.45rem;
-  color: var(--primary-sage);
-  font-weight: 700;
+  font-size: 2.65rem;
+  color: var(--primary-red);
+  margin-bottom: 6px;
+  line-height: 1.15;
 }
 
 .wishes-subtext {
   font-size: 0.9rem;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-bottom: 22px;
+  line-height: 1.6;
 }
 
-/* Privacy Guarantee Tag */
-.privacy-notice {
+.wishes-form {
+  text-align: left;
+}
+
+.wish-sender-line {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  background: var(--bg-sage-tint);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 0.82rem;
-  color: var(--primary-sage);
-  margin-bottom: 18px;
-}
-
-/* Khối hiển thị tên khách mời tự động (Khóa cố định không cần gõ) */
-.wish-sender-badge {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #F5F9F6;
-  border: 1px solid #D5E2D9;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-bottom: 16px;
-  font-size: 0.9rem;
+  margin-bottom: 12px;
+  font-size: 0.94rem;
 }
 
 .wish-sender-label {
   color: var(--text-muted);
 }
 
-.wish-sender-value {
-  color: var(--primary-sage);
+.wish-sender-name {
   font-weight: 700;
-  font-size: 1rem;
+  color: var(--primary-red);
 }
 
 .form-group {
   margin-bottom: 16px;
-  text-align: left;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
 }
 
 .form-textarea {
   width: 100%;
-  border: 1.5px solid #D7E4DC;
+  min-height: 96px;
+  padding: 13px 15px;
   border-radius: 12px;
-  padding: 12px 14px;
-  font-size: 0.95rem;
+  border: 1px solid rgba(110, 23, 35, 0.28);
+  background: #FFFFFF;
   font-family: inherit;
-  color: var(--text-primary);
-  background: #FCFDFD;
-  transition: all 0.25s ease;
-  min-height: 110px;
+  font-size: 0.94rem;
+  color: var(--text-main);
   resize: vertical;
-  line-height: 1.5;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .form-textarea:focus {
   outline: none;
-  border-color: var(--primary-sage);
-  box-shadow: 0 0 0 4px rgba(85, 122, 102, 0.12);
-  background: #FFFFFF;
+  border-color: var(--primary-red);
+  box-shadow: 0 0 0 3px rgba(110, 23, 35, 0.12);
 }
 
 .btn-send-wish {
   width: 100%;
-  background: var(--primary-sage);
+  padding: 13px 22px;
+  border-radius: var(--radius-pill);
+  background: var(--primary-red);
   color: #FFFFFF;
   border: none;
-  padding: 13px 20px;
-  border-radius: 12px;
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.25s ease;
+  box-shadow: 0 8px 20px rgba(110, 23, 35, 0.28);
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .btn-send-wish:hover {
-  background: var(--primary-sage-hover);
+  background: var(--primary-red-hover);
   transform: translateY(-2px);
-}
-
-.btn-send-wish:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .wish-success-box {
   display: none;
-  background: #EFF7F2;
-  border: 1px solid #C4E4CF;
-  border-radius: 14px;
-  padding: 18px;
+  margin-top: 18px;
+  padding: 14px 18px;
+  background: #E8F5E9;
+  border: 1px solid #A5D6A7;
+  border-radius: 12px;
+  color: #2E7D32;
+  font-size: 0.94rem;
   text-align: center;
-  animation: fadeIn 0.4s ease-in;
-}
-
-.wish-success-box p {
-  color: #2D7546;
-  font-size: 0.95rem;
-  font-weight: 600;
 }
 
 /* ==========================================================================
-   FOOTER SECTION (Thông tin liên hệ tối giản: SĐT + Zalo + Note Tên)
+   SECTION 10: FOOTER (NỀN ẢNH KỶ NIỆM PHỦ TÔNG ĐỎ RƯỢU VANG)
    ========================================================================== */
-.card-footer {
+.footer-section {
+  position: relative;
+  z-index: 2;
+  background: var(--primary-red-dark);
+  color: #FFFFFF;
+  /* Padding trên lớn vì Section 9 (Wishes) đè xuống 60px */
+  padding: 100px 24px 40px 24px;
   text-align: center;
-  margin-top: 32px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border-soft);
+  overflow: hidden;
+}
+
+.footer-backdrop-strip {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.footer-backdrop-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(3px);
+  opacity: 0.28;
+  transform: scale(1.06);
+}
+
+.footer-backdrop-tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(94, 18, 29, 0.85) 0%,
+    rgba(66, 10, 20, 0.95) 100%
+  );
+}
+
+.footer-content-wrapper {
+  position: relative;
+  z-index: 2;
+  max-width: 400px;
+  margin: 0 auto;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
 }
 
 .footer-hotline-title {
-  font-size: 0.8rem;
+  font-family: inherit;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--text-muted);
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 18px;
 }
 
-/* ==========================================================================
-   DANH SÁCH NGƯỜI LIÊN HỆ ĐÓN KHÁCH (LIST VIEW)
-   ========================================================================== */
 .footer-contacts-list {
-  background: #FFFFFF;
-  border: 1px solid var(--border-soft);
-  border-radius: 18px;
-  margin: 14px 0 22px 0;
-  box-shadow: 0 4px 14px rgba(85, 122, 102, 0.05);
-  overflow: hidden;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 350px;
+  margin: 0 auto 28px auto;
 }
 
-.contact-list-item {
+.contact-card-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 13px 16px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  color: #FFFFFF;
   gap: 12px;
-  transition: background-color 0.2s ease;
 }
 
-.contact-list-item:hover {
-  background-color: rgba(235, 242, 237, 0.45);
-}
-
-.contact-list-item + .contact-list-item {
-  border-top: 1px solid var(--border-soft);
-}
-
-.contact-list-info {
+.contact-person-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  align-items: flex-start;
+  text-align: left;
+  gap: 3px;
 }
 
-.contact-list-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--primary-sage);
+.contact-person-name {
+  font-family: inherit;
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: #FFFFFF;
   line-height: 1.3;
 }
 
-.contact-list-phone {
-  font-size: 0.84rem;
-  color: var(--text-muted);
-}
-
-.contact-list-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.contact-list-actions .contact-pill {
-  padding: 6px 13px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  gap: 5px;
-}
-
-.footer-contact-box {
-  background: #FFFFFF;
-  border: 1px solid var(--border-soft);
-  border-radius: 16px;
-  padding: 16px;
-  margin: 12px 0 20px 0;
-  box-shadow: 0 2px 8px rgba(85, 122, 102, 0.04);
-}
-
-.contact-name-note {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--primary-sage);
-  margin-bottom: 10px;
-}
-
-.footer-contact-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.contact-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-sage-tint);
-  border: 1px solid var(--border-soft);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--primary-sage);
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.contact-pill:hover {
-  background: var(--bg-sage-subtle);
-  border-color: var(--primary-sage);
-  transform: translateY(-1px);
-}
-
-.closing-message {
-  font-size: 1.25rem;
-  color: var(--accent-gold-dark);
-  margin-bottom: 6px;
-}
-
-.copyright-text {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.contact-person-phone {
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--accent-gold-light);
   letter-spacing: 0.5px;
 }
 
+.contact-actions-pair {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-contact-action {
+  padding: 7px 13px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: inherit;
+  transition: all 0.25s ease;
+}
+
+.btn-contact-call {
+  background: rgba(255, 255, 255, 0.22);
+  color: #FFFFFF;
+}
+
+.btn-contact-call:hover {
+  background: #FFFFFF;
+  color: var(--primary-red);
+}
+
+.btn-contact-zalo {
+  background: #0D72EB;
+  color: #FFFFFF;
+}
+
+.closing-message {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-style: italic;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+  letter-spacing: 0.4px;
+}
+
+.copyright-text {
+  font-family: inherit;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 2px;
+}
+
 /* ==========================================================================
-   MEME POPUP MODAL (Khi khách bấm trúng nút né tránh troll)
+   PHOTO LIGHTBOX MODAL (XEM ẢNH PHÓNG TO SẮC NÉT)
    ========================================================================== */
-.meme-modal {
+.photo-lightbox-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  display: flex;
+  z-index: 1150;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
 }
 
-.meme-modal.active {
-  opacity: 1;
-  visibility: visible;
+.photo-lightbox-modal.active {
+  display: flex;
+  animation: fadeInModal 0.28s ease-out;
 }
 
-.meme-card {
+.photo-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 4, 7, 0.9);
+  backdrop-filter: blur(10px);
+}
+
+.photo-lightbox-stage {
+  position: relative;
+  z-index: 2;
+  max-width: 92vw;
+  max-height: 86vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-lightbox-img {
+  max-width: 100%;
+  max-height: 85vh;
+  border-radius: 10px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(212, 175, 106, 0.35);
+  object-fit: contain;
+  animation: lightboxZoom 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lightboxZoom {
+  from {
+    transform: scale(0.88);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.photo-lightbox-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.photo-lightbox-nav:hover,
+.photo-lightbox-close:hover {
+  background: var(--primary-red);
+}
+
+.photo-lightbox-nav.prev {
+  left: 14px;
+}
+
+.photo-lightbox-nav.next {
+  right: 14px;
+}
+
+/* ==========================================================================
+   MODAL LIGHTBOX SƠ ĐỒ TRƯỜNG & HƯỚNG DẪN GỬI XE
+   ========================================================================== */
+.campus-map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.campus-map-modal.active {
+  display: flex;
+  animation: fadeInModal 0.3s ease-out;
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.campus-map-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(25, 6, 10, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.campus-map-modal-card {
+  position: relative;
+  z-index: 2;
   background: #FFFFFF;
   border-radius: 20px;
-  max-width: 390px;
+  max-width: 520px;
   width: 100%;
-  padding: 26px 22px;
-  text-align: center;
-  box-shadow: 0 20px 45px rgba(0,0,0,0.2);
-  transform: scale(0.9);
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
 }
 
-.meme-modal.active .meme-card {
-  transform: scale(1);
-}
-
-.meme-icon {
-  font-size: 2.8rem;
-  margin-bottom: 10px;
-}
-
-.meme-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--primary-sage);
-  margin-bottom: 6px;
-}
-
-.meme-desc {
-  font-size: 0.92rem;
-  color: var(--text-primary);
-  line-height: 1.5;
-  margin-bottom: 18px;
-}
-
-.btn-meme-ok {
-  background: var(--primary-sage);
-  color: #FFFFFF;
-  border: none;
-  padding: 11px 22px;
-  border-radius: 25px;
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Loading Spinner */
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #FFFFFF;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  display: inline-block;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ==========================================================================
-   UNAUTHORIZED SCREEN (Chặn link lạ / không có trong danh sách)
-   ========================================================================== */
-.unauthorized-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  background: var(--bg-sage-light);
+.campus-map-modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
-  text-align: center;
+  justify-content: space-between;
 }
 
-.unauthorized-card {
-  background: #FFFFFF;
-  border-radius: 24px;
-  border: 1px solid var(--border-soft);
-  padding: 40px 24px;
-  max-width: 420px;
+.campus-map-modal-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-red);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.campus-map-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.campus-map-modal-body {
+  padding: 14px;
+  overflow-y: auto;
+  background: #FAFAFA;
+}
+
+.campus-map-modal-body img {
   width: 100%;
-  box-shadow: 0 20px 45px rgba(85, 122, 102, 0.12);
-  animation: fadeIn 0.4s ease;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+}
+
+.campus-map-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+}
+
+.campus-map-modal-note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-note-item {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.modal-note-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive tinh chỉnh cho màn hình nhỏ */
+@media (max-width: 380px) {
+  .graduate-name-script {
+    font-size: 2.9rem;
+  }
+  .name-countdown-inner {
+    width: 86%;
+  }
+  .ceremony-date-wing {
+    min-width: 90px;
+  }
+  .ceremony-day-big {
+    font-size: 4rem;
+  }
+  .guest-name-spotlight {
+    font-size: 1.32rem;
+    padding: 8px 18px;
+  }
 }

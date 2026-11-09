@@ -14,16 +14,16 @@
 
   <style>
     :root {
-      --bg-sage: #F2F6F3;
+      --bg-sage: #FAF6F4;
       --bg-card: #FFFFFF;
-      --primary: #557A66;
-      --primary-hover: #466755;
-      --primary-subtle: #E6EFE9;
-      --accent-gold: #CDB375;
-      --accent-gold-dark: #A88D4E;
-      --text: #2C3831;
-      --text-muted: #6B7C72;
-      --border: #DCE8E0;
+      --primary: #731823;
+      --primary-hover: #5A101A;
+      --primary-subtle: #F6EBEB;
+      --accent-gold: #D1A858;
+      --accent-gold-dark: #A77F32;
+      --text: #2A1719;
+      --text-muted: #735D60;
+      --border: #E8D6D8;
     }
 
     * {
@@ -542,27 +542,21 @@
             </div>
           </div>
 
-          <!-- 3. Quản Lý Ảnh Cử Nhân (Thêm Bao Nhiêu Ảnh Tùy Thích) -->
+          <!-- 3. Quản Lý Ảnh Cử Nhân (Cố Định 8 Ảnh Theo Đúng Bố Cục) -->
           <div class="card">
             <div class="card-header-flex">
               <div class="card-title">
-                <span>🖼️ Ảnh Cử Nhân (<span id="photoCountBadge">1</span> ảnh)</span>
+                <span>🖼️ 8 Khung Ảnh Cố Định Chuẩn Bố Cục (<span id="photoCountBadge">8</span> ảnh)</span>
               </div>
               <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
             </div>
 
             <p class="hint-text" style="margin-bottom: 12px;">
-              💡 <strong>Thêm bao nhiêu ảnh tùy thích:</strong> Dán link ảnh hoặc link Google Drive (chia sẻ "Bất kỳ ai
-              có liên kết"). Nếu có từ 2 ảnh trở lên, thiệp sẽ tự động hiện 2 nút lật ảnh và chuyển ảnh mượt mà!
+              💡 <strong>Bố cục thiệp cố định chuẩn 8 ảnh:</strong> Để đảm bảo bố cục vòm cung và album ảnh luôn cân đối, đẹp mắt như mẫu thiết kế, bạn hãy dán đúng 8 link ảnh (hoặc link Google Drive chia sẻ công khai) vào từng ô tương ứng bên dưới:
             </p>
 
-            <!-- Danh sách các ô ảnh động -->
+            <!-- Danh sách 8 ô ảnh cố định -->
             <div id="photoSlotsContainer"></div>
-
-            <button type="button" id="btnAddPhotoSlot" class="btn btn-secondary btn-sm"
-              style="margin-top: 6px; width: 100%;">
-              ➕ Thêm Ảnh Khác
-            </button>
           </div>
 
           <!-- 4. Danh Sách Người Liên Hệ Đón Khách (Động) -->
@@ -987,33 +981,44 @@ Hoàng Long"></textarea>
       }
     }
 
-    function renderDynamicPhotoSlots(photosList) {
+    const PHOTO_SLOTS_METADATA = [
+      { num: 1, label: "Ảnh 1: Vòm Chân Dung Mở Đầu", note: "Hero Arch - Dọc 3:4 hoặc 4:5" },
+      { num: 2, label: "Ảnh 2: Dáng Đứng Giữa Thiệp", note: "Middle Portrait - Dọc 3:4 hoặc 9:16" },
+      { num: 3, label: "Ảnh 3: Nền Lịch Trình Buổi Lễ", note: "Timeline Backdrop - Ngoại cảnh sân trường" },
+      { num: 4, label: "Ảnh 4: Album - Ảnh Lớn Ở Trên", note: "Album Top Banner - Ngang 16:9 hoặc 4:3" },
+      { num: 5, label: "Ảnh 5: Album - Kỷ Niệm 1", note: "Album Grid - Trái trên (Vuông/Dọc)" },
+      { num: 6, label: "Ảnh 6: Album - Kỷ Niệm 2", note: "Album Grid - Phải trên (Vuông/Dọc)" },
+      { num: 7, label: "Ảnh 7: Album - Kỷ Niệm 3", note: "Album Grid - Trái dưới (Vuông/Dọc)" },
+      { num: 8, label: "Ảnh 8: Album - Kỷ Niệm 4", note: "Album Grid - Phải dưới (Tung mũ cử nhân)" }
+    ];
+
+    function renderDynamicPhotoSlots(photosList = []) {
       const container = document.getElementById("photoSlotsContainer");
       if (!container) return;
       container.innerHTML = "";
 
-      photosList.forEach((url, idx) => {
-        addSinglePhotoSlot(url, idx + 1);
+      PHOTO_SLOTS_METADATA.forEach((meta, idx) => {
+        const currentUrl = photosList[idx] || "";
+        addSingleFixedPhotoSlot(currentUrl, meta);
       });
       updatePhotoCountBadge();
     }
 
-    function addSinglePhotoSlot(url = "", slotNumber) {
+    function addSingleFixedPhotoSlot(url = "", meta) {
       const container = document.getElementById("photoSlotsContainer");
       if (!container) return;
 
-      const num = slotNumber || (container.children.length + 1);
       const slotCard = document.createElement("div");
       slotCard.className = "photo-slot-card";
 
       const thumbUrl = url ? normalizeDriveUrl(url) : "";
 
       slotCard.innerHTML = `
-        <img class="photo-thumb-preview" src="${thumbUrl}" alt="Ảnh ${num}" style="${thumbUrl ? '' : 'display:none;'}">
+        <img class="photo-thumb-preview" src="${thumbUrl}" alt="${meta.label}" style="${thumbUrl ? '' : 'display:none;'}">
         <div class="photo-slot-content">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <span class="photo-slot-label">Ảnh ${num} ${num === 1 ? '(Ảnh chính)' : ''}</span>
-            ${num > 1 ? '<button type="button" class="btn btn-danger btn-sm btn-delete-photo" title="Xóa ảnh này" style="padding:2px 8px; font-size:0.75rem;">🗑️ Xóa</button>' : ''}
+            <span class="photo-slot-label" style="color:var(--primary); font-weight:700;">${meta.label}</span>
+            <span style="font-size:0.75rem; color:var(--text-muted);">${meta.note}</span>
           </div>
           <input type="text" class="photo-url-input" placeholder="Dán link ảnh hoặc link Google Drive..." value="${url}">
         </div>
@@ -1021,7 +1026,6 @@ Hoàng Long"></textarea>
 
       const input = slotCard.querySelector(".photo-url-input");
       const thumb = slotCard.querySelector(".photo-thumb-preview");
-      const deleteBtn = slotCard.querySelector(".btn-delete-photo");
 
       input.addEventListener("input", () => {
         const val = input.value.trim();
@@ -1034,28 +1038,7 @@ Hoàng Long"></textarea>
         broadcastConfigToPreview();
       });
 
-      if (deleteBtn) {
-        deleteBtn.addEventListener("click", () => {
-          slotCard.remove();
-          reindexPhotoSlots();
-          broadcastConfigToPreview();
-        });
-      }
-
       container.appendChild(slotCard);
-      updatePhotoCountBadge();
-    }
-
-    function reindexPhotoSlots() {
-      const container = document.getElementById("photoSlotsContainer");
-      if (!container) return;
-      const cards = container.querySelectorAll(".photo-slot-card");
-      cards.forEach((card, idx) => {
-        const num = idx + 1;
-        const label = card.querySelector(".photo-slot-label");
-        if (label) label.textContent = `Ảnh ${num} ${num === 1 ? '(Ảnh chính)' : ''}`;
-      });
-      updatePhotoCountBadge();
     }
 
     function updatePhotoCountBadge() {

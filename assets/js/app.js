@@ -1,6 +1,6 @@
 /**
  * GRADUATION INVITATION APPLICATION SCRIPT
- * Minimalist Light Sage Green Edition
+ * Luxury Pastel Blue / Arch Editorial Edition
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,12 +23,12 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const localAuthorized = localStorage.getItem("invitation_authorized_guests");
     if (localAuthorized) authorizedList = JSON.parse(localAuthorized);
-  } catch(e) {}
+  } catch (e) { }
   if (!authorizedList.length && CONFIG.authorizedGuests) {
     authorizedList = CONFIG.authorizedGuests;
   }
 
-  let finalGuestName = rawGuestName ? decodeURIComponent(rawGuestName).trim() : "Bạn & Người thương";
+  let finalGuestName = rawGuestName ? decodeURIComponent(rawGuestName).trim() : "Anh / Chị / Bạn";
   const finalGuestId = guestId || "guest_" + Math.random().toString(36).substring(2, 7);
 
   // Nếu hệ thống ĐÃ CÓ danh sách khách mời và KHÔNG phải màn hình Demo / Preview:
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return; // Dừng khởi tạo thiệp
     }
 
-    // BẢO MẬT TUYỆT ĐỐI: Dùng tên và giờ đã được lưu theo mã ID (chống sửa parameter ?to= trên URL)
+    // Dùng tên và giờ đã được lưu theo mã ID
     finalGuestName = validGuest.name;
     if (validGuest.time) CONFIG.ceremony.time = validGuest.time;
   } else if (customTime) {
@@ -61,11 +61,17 @@ document.addEventListener("DOMContentLoaded", () => {
   initCountdown();
   initCalendarLink();
   initCampusMapLightbox();
-  initRunawayButton();
+  initGalleryLightbox();
   initRsvpHandler(finalGuestName, finalGuestId);
   initWishHandler(finalGuestName, finalGuestId);
+  initScrollReveal();
+  initScrollParallax();
+  initAmbientParticles();
 
-  // 5. Nếu ở chế độ Preview (admin preview), chỉ tự động mở phong bì nếu đang ở chế độ xem ruột thiệp (card)
+  // 5. Nếu ở chế độ Preview (admin preview), ẩn thanh cuộn khung điện thoại và tự động mở phong bì khi xem ruột thiệp
+  if (isPreview || window.self !== window.top) {
+    document.documentElement.classList.add("is-iframe-preview");
+  }
   if (isPreview && previewMode !== "envelope") {
     const envelopeScreen = document.getElementById("envelopeScreen");
     if (envelopeScreen) envelopeScreen.classList.add("opened");
@@ -110,6 +116,7 @@ function mergeConfig(data) {
   if (data.contacts && Array.isArray(data.contacts)) CONFIG.contacts = data.contacts;
   if (data.audio) Object.assign(CONFIG.audio, data.audio);
   if (data.photos && data.photos.length) CONFIG.photos = data.photos;
+  if (data.timeline && Array.isArray(data.timeline)) CONFIG.timeline = data.timeline;
 }
 
 /**
@@ -124,7 +131,13 @@ function initGuestDetails(guestName, guestId) {
   const cardGuestEl = document.getElementById("cardGuestName");
   if (cardGuestEl) cardGuestEl.textContent = guestName;
 
-  // Điền cố định vào sổ lưu bút lời chúc (người dùng không cần nhập lại tên)
+  // Điền vào ô nhập tên RSVP nếu có tên cụ thể
+  const rsvpNameInput = document.getElementById("rsvpGuestNameInput");
+  if (rsvpNameInput && guestName && guestName !== "Anh / Chị / Bạn") {
+    rsvpNameInput.value = guestName;
+  }
+
+  // Điền cố định vào lời chúc (người dùng không cần nhập lại tên)
   const wishSenderDisplay = document.getElementById("wishSenderDisplay");
   if (wishSenderDisplay) wishSenderDisplay.textContent = guestName;
 }
@@ -167,15 +180,13 @@ async function loadRemoteConfigIfAvailable() {
 
     if (json.status === "success" && json.data) {
       const remote = json.data;
-      
-      // Đọc cấu hình tùy chỉnh mà người dùng đã lưu trên máy (nếu có)
+
       let localCfg = null;
       try {
         const saved = localStorage.getItem("invitation_admin_config");
         if (saved) localCfg = JSON.parse(saved);
-      } catch(e) {}
+      } catch (e) { }
 
-      // Hàm gán thông minh: Không để giá trị mẫu mặc định trên Sheet ("Nguyễn Văn A") đè lên tên tùy chỉnh của người dùng
       const getVal = (remoteVal, localVal, defaultPlaceholder) => {
         if (!remoteVal) return localVal || defaultPlaceholder;
         if (remoteVal === defaultPlaceholder && localVal && localVal !== defaultPlaceholder) {
@@ -184,7 +195,6 @@ async function loadRemoteConfigIfAvailable() {
         return remoteVal;
       };
 
-      // Ghép nối cấu hình thông minh
       if (remote.graduate_name) {
         CONFIG.graduate.fullName = getVal(remote.graduate_name, localCfg?.graduate?.fullName, "Nguyễn Văn A");
       }
@@ -201,9 +211,6 @@ async function loadRemoteConfigIfAvailable() {
       if (sheetTime) {
         CONFIG.ceremony.time = getVal(sheetTime, localCfg?.ceremony?.time, "08:30");
       }
-      if (remote.date_formatted) {
-        CONFIG.ceremony.dateFormatted = getVal(remote.date_formatted, localCfg?.ceremony?.dateFormatted, "Thứ Sáu, 20 Tháng 11, 2026");
-      }
       if (remote.venue_name) {
         CONFIG.ceremony.venueName = getVal(remote.venue_name, localCfg?.ceremony?.venueName, "Hội trường A5, Đại học Bách Khoa TP.HCM");
       }
@@ -211,16 +218,16 @@ async function loadRemoteConfigIfAvailable() {
         CONFIG.ceremony.address = getVal(remote.address, localCfg?.ceremony?.address, "268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM");
       }
       if (remote.maps_url) {
-        CONFIG.ceremony.googleMapsUrl = getVal(remote.maps_url, localCfg?.ceremony?.googleMapsUrl, "");
+        CONFIG.ceremony.googleMapsUrl = getVal(remote.maps_url, localCfg?.ceremony?.googleMapsUrl, CONFIG.ceremony.googleMapsUrl);
       }
       if (remote.campus_map_url) {
-        CONFIG.ceremony.campusMapUrl = getVal(remote.campus_map_url, localCfg?.ceremony?.campusMapUrl, "assets/images/campus-map.jpg");
+        CONFIG.ceremony.campusMapUrl = normalizeDriveUrl(remote.campus_map_url);
       }
       if (remote.campus_map_note) {
-        CONFIG.ceremony.campusMapNote = getVal(remote.campus_map_note, localCfg?.ceremony?.campusMapNote, "Vào trường xong đi đến thẳng nhà E");
+        CONFIG.ceremony.campusMapNote = remote.campus_map_note;
       }
       if (remote.parking_note) {
-        CONFIG.ceremony.parkingNote = getVal(remote.parking_note, localCfg?.ceremony?.parkingNote, "Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.");
+        CONFIG.ceremony.parkingNote = remote.parking_note;
       }
       if (remote.contacts_json) {
         try {
@@ -229,52 +236,16 @@ async function loadRemoteConfigIfAvailable() {
             CONFIG.contacts = parsedContacts;
           }
         } catch (e) { }
-      } else if (remote.contact_phone || remote.contact_person) {
-        const fallbackList = [{ name: remote.contact_person || "Nguyễn Văn A", phone: remote.contact_phone || "0901 234 567" }];
-        if (remote.contact_phone2 || remote.contact_person2) {
-          fallbackList.push({ name: remote.contact_person2 || "Người đón tại cổng", phone: remote.contact_phone2 || "0902 345 678" });
-        }
-        CONFIG.contacts = fallbackList;
       }
-      // Audio luôn cố định từ file trong thư mục nội bộ
-      CONFIG.audio.url = "assets/audio/Cam-On-We-Belong-Together-Dong-Nhi-Trinh-Nhat-Minh.mp3";
+      if (remote.music_url) {
+        CONFIG.audio.url = normalizeDriveUrl(remote.music_url);
+      }
 
       if (remote.photo_urls) {
         const remotePhotos = remote.photo_urls.split(",").map(url => normalizeDriveUrl(url.trim())).filter(Boolean);
         if (remotePhotos.length) {
           CONFIG.photos = remotePhotos;
         }
-      }
-
-      // Đồng bộ danh sách khách hợp lệ từ Google Sheets để hỗ trợ mở trên mọi thiết bị
-      if (remote.guests_json) {
-        try {
-          const remoteGuests = JSON.parse(remote.guests_json);
-          if (Array.isArray(remoteGuests) && remoteGuests.length > 0) {
-            localStorage.setItem("invitation_authorized_guests", JSON.stringify(remoteGuests));
-            
-            // Nếu ban đầu trang bị chặn do thiết bị chưa có whitelist:
-            const unauthScreen = document.getElementById("unauthorizedScreen");
-            const urlParams = new URLSearchParams(window.location.search);
-            const gId = urlParams.get("id");
-            if (gId) {
-              const validGuest = remoteGuests.find(g => g.id === gId);
-              if (validGuest) {
-                if (unauthScreen) unauthScreen.style.display = "none";
-                const envelopeScreen = document.getElementById("envelopeScreen");
-                const mainWrapper = document.querySelector(".main-wrapper");
-                if (envelopeScreen) envelopeScreen.style.display = "";
-                if (mainWrapper) mainWrapper.style.display = "";
-                initGuestDetails(validGuest.name, validGuest.id);
-                if (validGuest.time) {
-                  CONFIG.ceremony.time = validGuest.time;
-                  const timeEl = document.getElementById("ceremonyTime");
-                  if (timeEl) timeEl.textContent = validGuest.time;
-                }
-              }
-            }
-          }
-        } catch(e) {}
       }
     }
   } catch (err) {
@@ -285,62 +256,61 @@ async function loadRemoteConfigIfAvailable() {
 }
 
 /**
- * Định dạng ngày sang tiếng Việt trang nhã, đẹp mắt
- * Chuyển các định dạng ISO (2026-11-19T17:00:00.000Z) thành dạng: "Thứ Sáu, ngày 20/11/2026"
- */
-function formatDisplayDate(rawDate) {
-  if (!rawDate) return "Thứ Sáu, ngày 20/11/2026";
-  const str = String(rawDate).trim();
-
-  // Nếu là dạng text thuần đã đẹp sẵn (không có T hoặc Z)
-  if (!str.includes("T") && !str.includes("Z") && !/^\d{4}-\d{2}-\d{2}/.test(str)) {
-    return str;
-  }
-
-  try {
-    const d = new Date(str);
-    if (isNaN(d.getTime())) return str;
-
-    const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
-    const dayOfWeek = days[d.getDay()];
-    const dateNum = String(d.getDate()).padStart(2, "0");
-    const monthNum = String(d.getMonth() + 1).padStart(2, "0");
-    const yearNum = d.getFullYear();
-
-    return `${dayOfWeek}, ngày ${dateNum}/${monthNum}/${yearNum}`;
-  } catch (e) {
-    return str;
-  }
-}
-
-/**
  * Cập nhật dữ liệu từ đối tượng CONFIG lên toàn bộ giao diện HTML
  */
 function applyConfigData(config) {
-  // Tên & Học vị cử nhân (Chủ tiệc)
-  setElementText("graduateFullName", config.graduate.fullName);
-  setElementText("graduateDegreeTitle", config.graduate.degreeTitle);
-  setElementText("graduateUniversity", config.graduate.university);
+  // 1. Tên cử nhân (Chủ tiệc)
+  const fullName = config.graduate.fullName || "Nguyễn Hà Minh Khánh";
+  setElementText("graduateFullName", fullName);
+  setElementText("envelopeInnerGradName", fullName);
+  const nameParts = fullName.trim().split(/\s+/);
+  const shortName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : "Khánh";
+  setElementText("graduateShortName", shortName);
+  setElementText("rsvpGraduateName", shortName);
+  setElementText("rsvpHostName", shortName);
 
-  // Thời gian & Địa điểm
+  // 2. Phân tích ngày giờ
+  let ceremonyDate = new Date(config.ceremony.dateTime);
+  if (isNaN(ceremonyDate.getTime())) ceremonyDate = new Date("2026-11-20T08:30:00");
+
+  const daysOfWeek = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+  const dayOfWeekStr = daysOfWeek[ceremonyDate.getDay()];
+  const dayNumStr = String(ceremonyDate.getDate()).padStart(2, "0");
+  const monthNum = ceremonyDate.getMonth() + 1;
+  const monthStr = `Tháng ${monthNum}`;
+  const yearStr = `Năm ${ceremonyDate.getFullYear()}`;
+  const heroDateStr = `${dayNumStr}.${String(monthNum).padStart(2, "0")}.${ceremonyDate.getFullYear()}`;
+
+  setElementText("ceremonyDayOfWeek", dayOfWeekStr);
+  setElementText("ceremonyMonth", monthStr);
+  setElementText("ceremonyDayNum", dayNumStr);
+  setElementText("ceremonyYear", yearStr);
   setElementText("ceremonyTimeFormatted", config.ceremony.time || "08:30");
-  setElementText("ceremonyDateFormatted", formatDisplayDate(config.ceremony.dateFormatted || config.ceremony.dateTime));
+  setElementText("heroCeremonyDate", heroDateStr);
+
+  // 3. Địa điểm
   setElementText("ceremonyVenueName", config.ceremony.venueName);
   setElementText("ceremonyAddress", config.ceremony.address);
 
-  // Google Maps link
+  // 4. Google Maps link
   const mapsBtn = document.getElementById("btnGoogleMaps");
   if (mapsBtn && config.ceremony.googleMapsUrl) {
     mapsBtn.href = config.ceremony.googleMapsUrl;
   }
 
-  // Danh sách người liên hệ đón khách (Dạng danh sách, không phân biệt vai trò)
+  // 5. Cài đặt 8 ảnh cố định theo bố cục
+  setupFixedPhotos(config.photos);
+
+  // 6. Hiển thị timeline chương trình
+  renderTimeline(config.timeline);
+
+  // 7. Hiển thị lịch tháng mini có trái tim ngày lễ
+  renderMiniCalendar(config.ceremony.dateTime);
+
+  // 8. Danh sách người liên hệ đón khách
   renderFooterContacts(config.contacts || config.contact);
 
-  // Khởi tạo hiển thị ảnh (1 ảnh hoặc chuyển nhẹ 2-3 ảnh)
-  setupPhotoArch(config.photos);
-
-  // Sơ đồ trường & Hướng dẫn di chuyển nội bộ
+  // 9. Sơ đồ trường & Hướng dẫn di chuyển nội bộ
   const campusMapImg = document.getElementById("campusMapImg");
   const campusMapModalImg = document.getElementById("campusMapModalImg");
   const campusMapNoteText = document.getElementById("campusMapNoteText");
@@ -359,7 +329,7 @@ function applyConfigData(config) {
   if (parkingNoteText && parkNote) parkingNoteText.textContent = parkNote;
   if (parkingModalNote && parkNote) parkingModalNote.textContent = parkNote;
 
-  // Cập nhật lại Calendar link & Countdown
+  // 10. Cập nhật lại Calendar link & Countdown
   initCalendarLink();
   initCountdown();
 }
@@ -380,7 +350,155 @@ function escapeHtml(str) {
 }
 
 /**
- * Hiển thị danh sách người liên hệ đón khách (Dạng danh sách, không phân biệt vai trò)
+ * Cài đặt 8 ảnh cố định theo đúng bố cục (Hero Arch, Portrait, Timeline, Album 5 ảnh)
+ */
+function setupFixedPhotos(photos) {
+  const validPhotos = (photos || []).map(normalizeDriveUrl).filter(Boolean);
+  const photoSlots = [
+    { id: "heroPhotoImg", default: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000&auto=format&fit=crop" },
+    { id: "portraitPhotoImg", default: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop" },
+    { id: "timelinePhotoImg", default: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1000&auto=format&fit=crop" },
+    { id: "albumPhotoTop", default: "https://images.unsplash.com/photo-1525921429624-479b6a26d84d?q=80&w=1000&auto=format&fit=crop" },
+    { id: "albumPhotoGrid1", default: "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=800&auto=format&fit=crop" },
+    { id: "albumPhotoGrid2", default: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop" },
+    { id: "albumPhotoGrid3", default: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop" },
+    { id: "albumPhotoGrid4", default: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800&auto=format&fit=crop" }
+  ];
+
+  photoSlots.forEach((slot, idx) => {
+    const imgEl = document.getElementById(slot.id);
+    if (imgEl) {
+      imgEl.src = validPhotos[idx] || slot.default;
+    }
+  });
+
+  // Ảnh nền mờ ở Footer lấy từ ảnh đầu tiên hoặc ảnh album
+  const footerBackdropImg = document.getElementById("footerBackdropImg");
+  if (footerBackdropImg) {
+    footerBackdropImg.src = validPhotos[0] || photoSlots[0].default;
+  }
+}
+
+/**
+ * Khởi tạo Timeline sự kiện (Khớp chuẩn icon cổng vòm trái tim & máy ảnh mẫu Canva)
+ */
+function renderTimeline(timelineData) {
+  const wrap = document.getElementById("timelineNodesWrap");
+  if (!wrap) return;
+
+  const items = (timelineData && timelineData.length) ? timelineData : [
+    { time: "8:00", title: "Làm lễ", icon: "ceremony" },
+    { time: "10:00", title: "Chụp ảnh", icon: "camera" }
+  ];
+
+  wrap.innerHTML = '<div class="timeline-vertical-line"></div>';
+
+  items.forEach((item, index) => {
+    const isReverse = index % 2 !== 0;
+    const row = document.createElement("div");
+    row.className = `timeline-item-row ${isReverse ? "reverse" : ""}`;
+
+    const iconSvg = item.icon === "camera"
+      ? `<svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+           <rect x="6" y="13" width="36" height="26" rx="5"></rect>
+           <path d="M16 13l3-5h10l3 5"></path>
+           <circle cx="24" cy="26" r="7.5"></circle>
+           <circle cx="24" cy="26" r="3.5"></circle>
+           <circle cx="35" cy="19" r="1.5" fill="currentColor"></circle>
+         </svg>`
+      : `<svg width="52" height="52" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+           <path d="M8 18L28 8L48 18H8Z"></path>
+           <path d="M11 18H45V22H11V18Z"></path>
+           <line x1="8" y1="46" x2="48" y2="46"></line>
+           <path d="M13 22V46"></path>
+           <path d="M43 22V46"></path>
+           <path d="M13 22C19 28 21 35 17 46"></path>
+           <path d="M43 22C37 28 35 35 39 46"></path>
+           <path d="M28 39.5C28 39.5 22 35.2 22 31.5C22 29.4 23.7 28 25.5 28C26.7 28 27.5 28.6 28 29.5C28.5 28.6 29.3 28 30.5 28C32.3 28 34 29.4 34 31.5C34 35.2 28 39.5 28 39.5Z"></path>
+         </svg>`;
+
+    row.innerHTML = `
+      <div class="timeline-icon-side">
+        <div class="timeline-icon-clean">${iconSvg}</div>
+      </div>
+      <div class="timeline-center-dot"></div>
+      <div class="timeline-text-side">
+        <div class="timeline-time-val">${escapeHtml(item.time)}</div>
+        <div class="timeline-name-val">${escapeHtml(item.title)}</div>
+      </div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+/**
+ * Hiển thị Lịch Tháng Mini có trái tim đánh dấu ngày lễ
+ */
+function renderMiniCalendar(dateTimeStr) {
+  const titleEl = document.getElementById("calendarWidgetMonthTitle");
+  const container = document.getElementById("miniCalendarContainer");
+  if (!container) return;
+
+  let date = new Date(dateTimeStr);
+  if (isNaN(date.getTime())) date = new Date("2026-11-20T08:30:00");
+
+  const year = date.getFullYear();
+  const month = date.getMonth(); // 0-indexed
+  const eventDay = date.getDate();
+
+  if (titleEl) {
+    titleEl.textContent = `Tháng ${month + 1}`;
+  }
+
+  // Thứ của ngày 1 trong tháng (0 = CN, 1 = T2, ...)
+  const firstDayRaw = new Date(year, month, 1).getDay();
+  // Chuyển sang dạng T2 = 0, CN = 6
+  const firstDayIdx = (firstDayRaw === 0) ? 6 : firstDayRaw - 1;
+
+  // Tổng số ngày trong tháng
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let html = `
+    <table class="mini-calendar-table">
+      <thead>
+        <tr>
+          <th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th>
+        </tr>
+      </thead>
+      <tbody><tr>
+  `;
+
+  // Các ô trống đầu tháng
+  for (let i = 0; i < firstDayIdx; i++) {
+    html += '<td></td>';
+  }
+
+  let currentCellCount = firstDayIdx;
+  for (let d = 1; d <= daysInMonth; d++) {
+    if (currentCellCount > 0 && currentCellCount % 7 === 0) {
+      html += '</tr><tr>';
+    }
+
+    if (d === eventDay) {
+      html += `<td><span class="calendar-heart-highlight">${d}</span></td>`;
+    } else {
+      html += `<td>${d}</td>`;
+    }
+    currentCellCount++;
+  }
+
+  // Các ô trống cuối tháng
+  while (currentCellCount % 7 !== 0) {
+    html += '<td></td>';
+    currentCellCount++;
+  }
+
+  html += '</tr></tbody></table>';
+  container.innerHTML = html;
+}
+
+/**
+ * Hiển thị danh sách người liên hệ đón khách
  */
 function renderFooterContacts(contactsData) {
   const container = document.getElementById("footerContactsList");
@@ -391,13 +509,6 @@ function renderFooterContacts(contactsData) {
     list = contactsData;
   } else if (CONFIG.contacts && Array.isArray(CONFIG.contacts) && CONFIG.contacts.length > 0) {
     list = CONFIG.contacts;
-  } else if (contactsData && typeof contactsData === "object") {
-    if (contactsData.phone || contactsData.personName) {
-      list.push({ name: contactsData.personName || "Người liên hệ", phone: contactsData.phone });
-    }
-    if (contactsData.phone2 || contactsData.personName2) {
-      list.push({ name: contactsData.personName2 || "Người liên hệ", phone: contactsData.phone2 });
-    }
   }
 
   if (!list.length) {
@@ -411,22 +522,19 @@ function renderFooterContacts(contactsData) {
     const cleanPhone = phone.replace(/[^0-9]/g, "");
 
     const row = document.createElement("div");
-    row.className = "contact-list-item";
+    row.className = "contact-card-item";
 
     let actionsHtml = "";
     if (cleanPhone) {
       actionsHtml = `
-        <div class="contact-list-actions">
-          <a href="tel:${cleanPhone}" class="contact-pill" title="Gọi cho ${escapeHtml(name)}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="contact-actions-pair">
+          <a href="tel:${cleanPhone}" class="btn-contact-action btn-contact-call" title="Gọi cho ${escapeHtml(name)}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
             </svg>
             <span>Gọi</span>
           </a>
-          <a href="https://zalo.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" class="contact-pill" title="Nhắn Zalo cho ${escapeHtml(name)}">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.02L5 22l4.3-1.43C10.16 20.8 11.06 21 12 21c5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
-            </svg>
+          <a href="https://zalo.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" class="btn-contact-action btn-contact-zalo" title="Nhắn Zalo cho ${escapeHtml(name)}">
             <span>Zalo</span>
           </a>
         </div>
@@ -434,9 +542,9 @@ function renderFooterContacts(contactsData) {
     }
 
     row.innerHTML = `
-      <div class="contact-list-info">
-        <div class="contact-list-name">${escapeHtml(name)}</div>
-        <div class="contact-list-phone">${escapeHtml(phone)}</div>
+      <div class="contact-person-info">
+        <div class="contact-person-name">${escapeHtml(name)}</div>
+        ${phone ? `<div class="contact-person-phone">${escapeHtml(phone)}</div>` : ""}
       </div>
       ${actionsHtml}
     `;
@@ -445,111 +553,7 @@ function renderFooterContacts(contactsData) {
 }
 
 /**
- * Cài đặt khung ảnh vuông (Hỗ trợ bao nhiêu ảnh tùy thích, lật ảnh & tự động chuyển)
- */
-let photoSliderInterval = null;
-let currentPhotoIdx = 0;
-
-function setupPhotoArch(photos) {
-  const container = document.getElementById("photoArchInner");
-  const btnPrev = document.getElementById("photoNavPrev");
-  const btnNext = document.getElementById("photoNavNext");
-  const dotsContainer = document.getElementById("photoDotsContainer");
-  if (!container || !photos || photos.length === 0) return;
-
-  if (photoSliderInterval) clearInterval(photoSliderInterval);
-  container.innerHTML = "";
-  if (dotsContainer) dotsContainer.innerHTML = "";
-
-  const validPhotos = photos.map(normalizeDriveUrl).filter(Boolean);
-
-  if (validPhotos.length <= 1) {
-    // Chỉ có 1 ảnh: Ẩn 2 nút lật và các chấm dots
-    if (btnPrev) btnPrev.style.display = "none";
-    if (btnNext) btnNext.style.display = "none";
-    if (dotsContainer) dotsContainer.style.display = "none";
-
-    const img = document.createElement("img");
-    img.src = validPhotos[0] || "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000";
-    img.alt = "Ảnh cử nhân";
-    img.loading = "eager";
-    container.appendChild(img);
-  } else {
-    // Có từ 2 ảnh trở lên: Hiện 2 nút lật và các chấm chuyển ảnh
-    if (btnPrev) btnPrev.style.display = "flex";
-    if (btnNext) btnNext.style.display = "flex";
-    if (dotsContainer) dotsContainer.style.display = "flex";
-
-    validPhotos.forEach((src, idx) => {
-      const img = document.createElement("img");
-      img.src = src;
-      img.alt = `Ảnh cử nhân ${idx + 1}`;
-      img.className = `slider-item ${idx === 0 ? "active" : ""}`;
-      img.loading = idx === 0 ? "eager" : "lazy";
-      container.appendChild(img);
-
-      if (dotsContainer) {
-        const dot = document.createElement("span");
-        dot.className = `photo-dot ${idx === 0 ? "active" : ""}`;
-        dot.addEventListener("click", (e) => {
-          e.stopPropagation();
-          goToPhoto(idx);
-        });
-        dotsContainer.appendChild(dot);
-      }
-    });
-
-    currentPhotoIdx = 0;
-    const items = container.querySelectorAll(".slider-item");
-    const dots = dotsContainer ? dotsContainer.querySelectorAll(".photo-dot") : [];
-
-    function goToPhoto(index) {
-      if (items[currentPhotoIdx]) items[currentPhotoIdx].classList.remove("active");
-      if (dots[currentPhotoIdx]) dots[currentPhotoIdx].classList.remove("active");
-
-      currentPhotoIdx = (index + items.length) % items.length;
-
-      if (items[currentPhotoIdx]) items[currentPhotoIdx].classList.add("active");
-      if (dots[currentPhotoIdx]) dots[currentPhotoIdx].classList.add("active");
-
-      restartTimer();
-    }
-
-    function nextPhoto() {
-      goToPhoto(currentPhotoIdx + 1);
-    }
-
-    function prevPhoto() {
-      goToPhoto(currentPhotoIdx - 1);
-    }
-
-    if (btnPrev) {
-      btnPrev.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        prevPhoto();
-      };
-    }
-
-    if (btnNext) {
-      btnNext.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        nextPhoto();
-      };
-    }
-
-    function restartTimer() {
-      if (photoSliderInterval) clearInterval(photoSliderInterval);
-      photoSliderInterval = setInterval(nextPhoto, 4500);
-    }
-
-    restartTimer();
-  }
-}
-
-/**
- * Xử lý mở phong bì thư (Wax seal click)
+ * Xử lý mở phong bì thư (Hiệu ứng mở nắp 3D, rút thiệp lên mượt mà & tung pháo hoa)
  */
 function initEnvelopeOpener() {
   const envelopeScreen = document.getElementById("envelopeScreen");
@@ -557,17 +561,240 @@ function initEnvelopeOpener() {
   const envelopeBody = document.getElementById("envelopeBody");
   if (!envelopeScreen) return;
 
+  let isOpening = false;
   const openEnvelope = () => {
-    triggerConfetti();
-    envelopeScreen.classList.add("opened");
+    if (isOpening) return;
+    isOpening = true;
+
+    // Giai đoạn 1: Nắp mở xoay 3D ra phía sau và tấm thiệp trượt lên trên nền kem rõ nét
+    envelopeScreen.classList.add("unsealing");
 
     if (CONFIG.audio.enabled && CONFIG.audio.autoPlayOnOpen) {
       playAudio();
     }
+
+    // Giai đoạn 2: Chuyển cảnh mượt mà vào nội dung thiệp chính và tung pháo giấy
+    setTimeout(() => {
+      envelopeScreen.classList.add("opened");
+      triggerConfetti();
+      initScrollReveal();
+    }, 900);
   };
 
   if (waxSeal) waxSeal.addEventListener("click", openEnvelope);
   if (envelopeBody) envelopeBody.addEventListener("click", openEnvelope);
+}
+
+/**
+ * Hiệu ứng Scroll Reveal đa hướng (Cuộn tới đâu các thành phần xuất hiện mượt mà, không gây tràn khung)
+ */
+function initScrollReveal() {
+  const elements = document.querySelectorAll(".anim-on-scroll, .reveal-on-scroll");
+  if (!elements.length) return;
+
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-revealed");
+          obs.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.08,
+      rootMargin: "0px 0px -30px 0px"
+    });
+
+    elements.forEach(el => observer.observe(el));
+  } else {
+    elements.forEach(el => el.classList.add("is-revealed"));
+  }
+}
+
+/**
+ * Hiệu ứng Parallax nhẹ nhàng cho các khung ảnh lớn khi cuộn trang
+ */
+function initScrollParallax() {
+  const parallaxImages = document.querySelectorAll(".parallax-img");
+  if (!parallaxImages.length) return;
+
+  let ticking = false;
+  const updateParallax = () => {
+    const vh = window.innerHeight || 800;
+    parallaxImages.forEach(img => {
+      const rect = img.parentElement.getBoundingClientRect();
+      if (rect.bottom > 0 && rect.top < vh) {
+        const progress = (vh - rect.top) / (vh + rect.height);
+        const shift = (progress - 0.5) * -26;
+        img.style.transform = `translate3d(0, ${shift.toFixed(1)}px, 0) scale(1.04)`;
+      }
+    });
+    ticking = false;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(updateParallax);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  updateParallax();
+}
+
+/**
+ * Hiệu ứng Cánh Hoa Rơi & Ánh Sao Vàng Kim Lấp Lánh (Rõ Nét, Sang Trọng)
+ */
+function initAmbientParticles() {
+  const canvas = document.getElementById("ambientCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  window.addEventListener("resize", () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  const particleCount = Math.min(44, Math.max(26, Math.floor(width / 28)));
+  const particles = Array.from({ length: particleCount }, (_, i) => {
+    const type = i % 3 === 0 ? "petal-rose" : (i % 3 === 1 ? "petal-wine" : "sparkle-gold");
+    return {
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: type === "sparkle-gold" ? (Math.random() * 4.5 + 4) : (Math.random() * 5.5 + 6.5),
+      vx: (Math.random() - 0.5) * 0.55,
+      vy: Math.random() * 0.75 + 0.45,
+      alpha: Math.random() * 0.3 + 0.62,
+      phase: Math.random() * Math.PI * 2,
+      spinSpeed: (Math.random() - 0.5) * 0.03,
+      rotation: Math.random() * Math.PI * 2,
+      type
+    };
+  });
+
+  function drawPetal(ctx, size, fillStyle) {
+    ctx.fillStyle = fillStyle;
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.bezierCurveTo(size * 0.95, -size * 0.75, size * 0.85, size * 0.65, 0, size);
+    ctx.bezierCurveTo(-size * 0.85, size * 0.65, -size * 0.95, -size * 0.75, 0, -size);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawStarSparkle(ctx, size, alpha) {
+    ctx.fillStyle = `rgba(218, 170, 72, ${alpha})`;
+    ctx.shadowColor = "rgba(218, 170, 72, 0.85)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    const inner = size * 0.28;
+    for (let i = 0; i < 4; i++) {
+      const angle = (i * Math.PI) / 2;
+      const nextAngle = angle + Math.PI / 4;
+      ctx.lineTo(Math.cos(angle) * size, Math.sin(angle) * size);
+      ctx.lineTo(Math.cos(nextAngle) * inner, Math.sin(nextAngle) * inner);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function renderFrame() {
+    ctx.clearRect(0, 0, width, height);
+
+    particles.forEach(p => {
+      p.phase += 0.024;
+      p.rotation += p.spinSpeed;
+      p.x += p.vx + Math.sin(p.phase) * 0.45;
+      p.y += p.vy;
+
+      if (p.y > height + 18) {
+        p.y = -16;
+        p.x = Math.random() * width;
+      }
+      if (p.x > width + 18) p.x = -14;
+      if (p.x < -18) p.x = width + 14;
+
+      const twinkle = p.alpha * (0.75 + 0.25 * Math.sin(p.phase * 1.6));
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+
+      if (p.type === "petal-rose") {
+        ctx.scale(1, 0.75 + 0.25 * Math.cos(p.phase));
+        drawPetal(ctx, p.size, `rgba(224, 122, 142, ${twinkle * 0.85})`);
+      } else if (p.type === "petal-wine") {
+        ctx.scale(1, 0.75 + 0.25 * Math.sin(p.phase));
+        drawPetal(ctx, p.size * 0.9, `rgba(136, 26, 42, ${twinkle * 0.72})`);
+      } else {
+        drawStarSparkle(ctx, p.size, twinkle);
+      }
+      ctx.restore();
+    });
+
+    requestAnimationFrame(renderFrame);
+  }
+
+  requestAnimationFrame(renderFrame);
+}
+
+/**
+ * Lightbox xem phóng to 5 ảnh trong Album Graduation
+ */
+function initGalleryLightbox() {
+  const modal = document.getElementById("photoLightboxModal");
+  const lightboxImg = document.getElementById("photoLightboxImg");
+  const closeBtn = document.getElementById("btnCloseLightbox");
+  const prevBtn = document.getElementById("btnPrevLightbox");
+  const nextBtn = document.getElementById("btnNextLightbox");
+  const backdrop = document.getElementById("photoLightboxBackdrop");
+  const slots = document.querySelectorAll("[data-lightbox-slot]");
+  if (!modal || !lightboxImg || !slots.length) return;
+
+  let currentIdx = 0;
+
+  const getSlotSrc = (idx) => {
+    const slot = document.querySelector(`[data-lightbox-slot="${idx}"] img`);
+    return slot ? slot.src : "";
+  };
+
+  const openAt = (idx) => {
+    currentIdx = (idx + slots.length) % slots.length;
+    const src = getSlotSrc(currentIdx);
+    if (!src) return;
+    lightboxImg.src = src;
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  };
+
+  const closeLightbox = () => {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  };
+
+  slots.forEach(slot => {
+    slot.addEventListener("click", () => {
+      const idx = parseInt(slot.getAttribute("data-lightbox-slot"), 10) || 0;
+      openAt(idx);
+    });
+  });
+
+  if (closeBtn) closeBtn.addEventListener("click", closeLightbox);
+  if (backdrop) backdrop.addEventListener("click", closeLightbox);
+  if (prevBtn) prevBtn.addEventListener("click", () => openAt(currentIdx - 1));
+  if (nextBtn) nextBtn.addEventListener("click", () => openAt(currentIdx + 1));
+
+  document.addEventListener("keydown", (e) => {
+    if (!modal.classList.contains("active")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") openAt(currentIdx - 1);
+    if (e.key === "ArrowRight") openAt(currentIdx + 1);
+  });
 }
 
 /**
@@ -647,7 +874,7 @@ function initCountdown() {
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    daysEl.textContent = String(days).padStart(2, "0");
+    daysEl.textContent = String(days);
     hoursEl.textContent = String(hours).padStart(2, "0");
     minsEl.textContent = String(minutes).padStart(2, "0");
     secsEl.textContent = String(seconds).padStart(2, "0");
@@ -658,39 +885,42 @@ function initCountdown() {
 }
 
 /**
- * Tạo link thêm sự kiện vào Google Calendar tự động
+ * Tạo link thêm vào Google Calendar
  */
 function initCalendarLink() {
-  const calBtn = document.getElementById("btnGoogleCalendar");
-  if (!calBtn) return;
+  const calendarBtn = document.getElementById("btnGoogleCalendar");
+  if (!calendarBtn) return;
 
   try {
-    const start = new Date(CONFIG.ceremony.dateTime);
-    const end = new Date(start.getTime() + 3.5 * 60 * 60 * 1000);
+    const startObj = new Date(CONFIG.ceremony.dateTime);
+    if (isNaN(startObj.getTime())) return;
 
-    const formatCalTime = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
-    const dates = `${formatCalTime(start)}/${formatCalTime(end)}`;
+    const endObj = new Date(startObj.getTime() + 2 * 60 * 60 * 1000);
 
-    const title = encodeURIComponent(CONFIG.ceremony.calendarTitle || `Lễ Tốt Nghiệp của ${CONFIG.graduate.shortName} 🎓`);
-    const details = encodeURIComponent(CONFIG.ceremony.calendarDetails || `${CONFIG.graduate.degreeTitle} tại ${CONFIG.ceremony.venueName}`);
-    const location = encodeURIComponent(CONFIG.ceremony.address || CONFIG.ceremony.venueName);
+    const fmt = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const datesParam = `${fmt(startObj)}/${fmt(endObj)}`;
 
-    calBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
+    const title = encodeURIComponent(CONFIG.ceremony.calendarTitle || "Lễ Tốt Nghiệp Đại Học 🎓");
+    const details = encodeURIComponent(CONFIG.ceremony.calendarDetails || "Chung vui trong buổi lễ tốt nghiệp!");
+    const location = encodeURIComponent(`${CONFIG.ceremony.venueName}, ${CONFIG.ceremony.address}`);
+
+    calendarBtn.href = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${datesParam}&details=${details}&location=${location}`;
   } catch (e) {
     console.error("Lỗi tạo calendar link:", e);
   }
 }
 
 /**
- * Quản lý mở / đóng Modal phóng to Sơ đồ di chuyển trong trường
+ * Quản lý mở / đóng Modal phóng to Sơ đồ di chuyển trong trường & Gửi xe
  */
 function initCampusMapLightbox() {
-  const trigger = document.getElementById("campusMapTrigger");
+  const btnTrigger = document.getElementById("btnOpenCampusMap");
+  const inlineTrigger = document.getElementById("campusMapTrigger");
   const modal = document.getElementById("campusMapModal");
   const closeBtn = document.getElementById("btnCloseCampusMap");
   const backdrop = document.getElementById("campusMapModalBackdrop");
 
-  if (!trigger || !modal) return;
+  if (!modal) return;
 
   function openModal() {
     modal.classList.add("active");
@@ -704,13 +934,16 @@ function initCampusMapLightbox() {
     document.body.style.overflow = "";
   }
 
-  trigger.addEventListener("click", openModal);
-  trigger.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      openModal();
-    }
-  });
+  if (btnTrigger) btnTrigger.addEventListener("click", openModal);
+  if (inlineTrigger) {
+    inlineTrigger.addEventListener("click", openModal);
+    inlineTrigger.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openModal();
+      }
+    });
+  }
 
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
   if (backdrop) backdrop.addEventListener("click", closeModal);
@@ -723,125 +956,97 @@ function initCampusMapLightbox() {
 }
 
 /**
- * Nút "Không đồng ý tham gia" né tránh / troll vui nhộn
- */
-function initRunawayButton() {
-  const runawayBtn = document.getElementById("btnRunaway");
-  const memeModal = document.getElementById("memeModal");
-  const closeMemeBtn = document.getElementById("btnMemeOk");
-  if (!runawayBtn) return;
-
-  const teaseMessages = [
-    "Ủa bấm chi dợ? 😂",
-    "Không cho từ chối đâu hehe 😜",
-    "Bấm nút xanh bên cạnh kìa! 👉",
-    "Từ chối là tình bạn kết thúc đó nha 🥺",
-    "Đừng bấm em nữa mà, em chạy mệt rồi 🏃‍♂️",
-    "Bấm nút xanh đi màaaa! ✨",
-    "Nút này bị hỏng rồi bạn ơiii 🙈",
-    "Bấm trúng mình tặng 1 ly trà sữa 🧋 (đùa đó)"
-  ];
-
-  let dodgeCount = 0;
-
-  const dodge = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
-    dodgeCount++;
-    runawayBtn.classList.add("teleporting");
-
-    const msg = teaseMessages[dodgeCount % teaseMessages.length];
-    runawayBtn.textContent = msg;
-
-    const btnWidth = runawayBtn.offsetWidth || 140;
-    const btnHeight = runawayBtn.offsetHeight || 44;
-    const padding = 20;
-
-    const maxLeft = window.innerWidth - btnWidth - padding;
-    const maxTop = window.innerHeight - btnHeight - padding;
-
-    const newLeft = Math.max(padding, Math.floor(Math.random() * maxLeft));
-    const newTop = Math.max(padding, Math.floor(Math.random() * maxTop));
-
-    runawayBtn.style.left = `${newLeft}px`;
-    runawayBtn.style.top = `${newTop}px`;
-  };
-
-  // Chỉ né tránh và chạy nhảy khi người dùng THẬT SỰ NHẤN (click) vào nút
-  runawayBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dodge(e);
-
-    // Sau khi nhấn né 3 lần trở lên thì hiển thị popup meme vui nhộn
-    if (dodgeCount >= 3 && memeModal) {
-      setTimeout(() => {
-        memeModal.classList.add("active");
-      }, 350);
-    }
-  });
-
-  if (closeMemeBtn && memeModal) {
-    closeMemeBtn.addEventListener("click", () => {
-      memeModal.classList.remove("active");
-      const attendBtn = document.getElementById("btnAttend");
-      if (attendBtn) attendBtn.click();
-    });
-  }
-}
-
-/**
- * Xử lý xác nhận RSVP (Chắc chắn tham gia)
+ * Xử lý xác nhận RSVP (Lịch sự, trang nhã cho cả 2 lựa chọn Tham dự / Bận)
  */
 function initRsvpHandler(guestName, guestId) {
   const attendBtn = document.getElementById("btnAttend");
-  const runawayBtn = document.getElementById("btnRunaway");
+  const declineBtn = document.getElementById("btnDecline") || document.getElementById("btnRunaway");
+  const submitBtn = document.getElementById("btnSubmitRsvp");
+  const nameInput = document.getElementById("rsvpGuestNameInput");
   const statusMsg = document.getElementById("rsvpStatusMessage");
   if (!attendBtn) return;
 
+  let currentChoice = "attending"; // Mặc định chọn "Có, tôi sẽ tham dự"
+
+  const selectChoice = (choice) => {
+    currentChoice = choice;
+    if (choice === "attending") {
+      attendBtn.classList.add("selected");
+      if (declineBtn) declineBtn.classList.remove("selected");
+    } else {
+      attendBtn.classList.remove("selected");
+      if (declineBtn) declineBtn.classList.add("selected");
+    }
+  };
+
   const storageKey = `rsvp_${guestId}`;
-  if (localStorage.getItem(storageKey) === "attending") {
-    markAttendConfirmed(attendBtn, runawayBtn, statusMsg, true);
+  const savedChoice = localStorage.getItem(storageKey);
+  if (savedChoice === "attending" || savedChoice === "declined") {
+    selectChoice(savedChoice);
+    markRsvpConfirmed(savedChoice, submitBtn, statusMsg, true);
   }
 
-  attendBtn.addEventListener("click", async () => {
-    markAttendConfirmed(attendBtn, runawayBtn, statusMsg, false);
-    triggerConfetti();
-    localStorage.setItem(storageKey, "attending");
+  // Bấm chọn tham gia hoặc báo bận
+  attendBtn.addEventListener("click", () => selectChoice("attending"));
+  if (declineBtn) {
+    declineBtn.addEventListener("click", () => selectChoice("declined"));
+  }
+
+  // Bấm nút "Gửi xác nhận"
+  const handleSubmit = async () => {
+    const effectiveName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : guestName;
+    const isAttending = currentChoice === "attending";
+
+    markRsvpConfirmed(currentChoice, submitBtn, statusMsg, false);
+    if (isAttending) {
+      triggerConfetti();
+    }
+    localStorage.setItem(storageKey, currentChoice);
 
     // Gửi dữ liệu về Google Sheets
     if (CONFIG.googleSheetScriptUrl) {
       try {
         await postDataToGoogleSheets({
           action: "rsvp",
-          guestName: guestName,
+          guestName: effectiveName,
           guestId: guestId,
-          status: "Chắc chắn tham gia"
+          guestsCount: isAttending ? 1 : 0,
+          status: isAttending ? "Chắc chắn tham gia" : "Không thể tham dự"
         });
       } catch (err) {
         console.warn("Lỗi gửi RSVP:", err);
       }
     }
-  });
+  };
+
+  if (submitBtn) {
+    submitBtn.addEventListener("click", handleSubmit);
+  }
 }
 
-function markAttendConfirmed(attendBtn, runawayBtn, statusMsg, isRestored) {
-  attendBtn.classList.add("confirmed");
-  attendBtn.innerHTML = `<span>✓ Đã xác nhận tham gia! Hẹn gặp bạn nhé! 🎉</span>`;
-  if (runawayBtn) runawayBtn.style.display = "none";
+function markRsvpConfirmed(choice, submitBtn, statusMsg, isRestored) {
+  const isAttending = choice === "attending";
+  if (submitBtn) {
+    submitBtn.innerHTML = isAttending
+      ? `<span>✓ Đã xác nhận tham dự</span>`
+      : `<span>✓ Đã gửi phản hồi</span>`;
+    submitBtn.style.background = isAttending ? "#2E7D32" : "#685053";
+  }
   if (statusMsg) {
     statusMsg.style.display = "block";
-    statusMsg.textContent = isRestored 
-      ? "Bạn đã xác nhận tham gia sự kiện này rồi! ❤️" 
-      : "Tuyệt vời quá! Sự hiện diện của bạn là niềm vui lớn nhất của mình! ❤️";
+    statusMsg.style.color = isAttending ? "#2E7D32" : "var(--primary-red)";
+    if (isAttending) {
+      statusMsg.textContent = isRestored
+        ? "Bạn đã gửi xác nhận tham dự rồi nhé, cảm ơn bạn rất nhiều! ❤️"
+        : "Tuyệt vời quá! Sự hiện diện của bạn là niềm vui lớn nhất của mình! ❤️";
+    } else {
+      statusMsg.textContent = "Cảm ơn bạn đã phản hồi! Rất tiếc vì chưa thể gặp bạn dịp này, hẹn gặp bạn một dịp gần nhất nhé! ❤️";
+    }
   }
 }
 
 /**
- * Xử lý gửi lời chúc riêng tư (Tự động dùng tên trong URL, không cần gõ lại)
+ * Xử lý gửi lời chúc riêng tư
  */
 function initWishHandler(guestName, guestId) {
   const wishForm = document.getElementById("wishForm");
@@ -909,15 +1114,15 @@ async function postDataToGoogleSheets(payload) {
 }
 
 /**
- * Hiệu ứng pháo giấy / lá rơi ăn mừng (Light Sage Green & Champagne Gold)
+ * Hiệu ứng pháo giấy ăn mừng (Burgundy Red & Champagne Gold & Rose White)
  */
 function triggerConfetti() {
   if (typeof confetti === "function") {
     confetti({
-      particleCount: 80,
-      spread: 70,
+      particleCount: 90,
+      spread: 75,
       origin: { y: 0.6 },
-      colors: ["#557A66", "#CDB375", "#8BAAA0", "#F7F1DF"]
+      colors: ["#731823", "#D1A858", "#B78D38", "#FFFFFF", "#F6EBEB"]
     });
   }
 }
