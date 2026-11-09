@@ -714,6 +714,14 @@ Hoàng Long"></textarea>
     let currentGuestList = [];
     let renderGuestsTableGlobal = null;
 
+    function getInvitationBaseUrl() {
+      const cleanUrl = window.location.href.split("?")[0].split("#")[0];
+      if (window.location.protocol === "file:") {
+        return cleanUrl.replace(/admin\.html$/i, "index.html");
+      }
+      return cleanUrl.replace(/\/admin(?:\.html)?\/?$/i, "/");
+    }
+
     function escapeHtml(str) {
       if (!str) return "";
       return String(str)
@@ -1161,8 +1169,7 @@ Hoàng Long"></textarea>
             try {
               const parsedGuests = JSON.parse(remote.guests_json);
               if (Array.isArray(parsedGuests) && parsedGuests.length > 0) {
-                let baseUrl = window.location.href.split("?")[0].replace("admin.html", "index.html");
-                if (!baseUrl.endsWith("index.html")) baseUrl = baseUrl.replace(/\/$/, "") + "/index.html";
+                const baseUrl = getInvitationBaseUrl();
 
                 currentGuestList = parsedGuests.map(g => ({
                   ...g,
@@ -1367,11 +1374,8 @@ Hoàng Long"></textarea>
       const tabGuestCount = document.getElementById("tabGuestCount");
       const copiedCountBadge = document.getElementById("copiedCountBadge");
 
-      // Tự động nhận diện đường dẫn web trỏ thẳng đến index.html
-      let baseUrl = window.location.href.split("?")[0].replace("admin.html", "index.html");
-      if (!baseUrl.endsWith("index.html")) {
-        baseUrl = baseUrl.replace(/\/$/, "") + "/index.html";
-      }
+      // Tự động nhận diện đường dẫn web trỏ thẳng đến trang chủ thiệp (loại bỏ /admin hoặc /admin.html)
+      const baseUrl = getInvitationBaseUrl();
 
       let copiedIds = JSON.parse(localStorage.getItem("invitation_copied_ids") || "[]");
 
@@ -1380,12 +1384,11 @@ Hoàng Long"></textarea>
       if (savedListJson) {
         try {
           currentGuestList = JSON.parse(savedListJson);
-          // Vá lại link nếu cũ
+          // Tự động sửa lại mọi link cũ bị dính /admin/index.html sang đường dẫn chuẩn mới
           currentGuestList.forEach(item => {
-            if (item.url && item.url.includes("/?") && !item.url.includes("index.html?")) {
-              item.url = item.url.replace("/?", "/index.html?");
-            }
+            item.url = `${baseUrl}?to=${encodeURIComponent(item.name)}&id=${item.id}&time=${encodeURIComponent(item.time || "08:30")}`;
           });
+          localStorage.setItem("invitation_authorized_guests", JSON.stringify(currentGuestList));
           if (currentGuestList.length > 0) {
             renderGuestsTable();
           }
