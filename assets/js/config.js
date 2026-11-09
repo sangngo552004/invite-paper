@@ -11,7 +11,7 @@ const CONFIG = {
 
   // 2. Thông tin cử nhân (Chủ tiệc)
   graduate: {
-    fullName: "Nguyễn Hà Minh Khánh",
+    fullName: "Nguyễn Kim Ngân",
     degreeTitle: "Cử nhân Kinh Tế",
     university: "Đại học Kinh Tế TP.HCM (UEH)"
   },
@@ -29,7 +29,7 @@ const CONFIG = {
     venueName: "Trường Đại Học Kinh Tế Thành Phố Hồ Chí Minh",
     address: "Cơ sở A - 59 C Nguyễn Đình Chiểu, Xuân Hòa, TP. Hồ Chí Minh",
     googleMapsUrl: "https://maps.google.com/?q=59C+Nguyễn+Đình+Chiểu+Xuân+Hòa+Hồ+Chí+Minh",
-    calendarTitle: "Lễ Tốt Nghiệp của Nguyễn Hà Minh Khánh 🎓",
+    calendarTitle: "Lễ Tốt Nghiệp của Nguyễn Kim Ngân 🎓",
     calendarDetails: "Lễ tốt nghiệp tại Cơ sở A. Liên hệ khi tới nơi: 0901234567",
 
     // Sơ đồ trường & Hướng dẫn di chuyển nội bộ

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#9E2436" />
+      <stop offset="55%" stop-color="#7A1826" />
+      <stop offset="100%" stop-color="#4E0D17" />
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0B8" />
+      <stop offset="50%" stop-color="#DFB76C" />
+      <stop offset="100%" stop-color="#A67A2E" />
+    </linearGradient>
+  </defs>
+  <!-- Nền tròn con dấu Đỏ Đô viền Vàng Kim -->
+  <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="url(#gold)" stroke-width="3" />
+  <circle cx="32" cy="32" r="25.5" fill="none" stroke="url(#gold)" stroke-width="1" stroke-dasharray="2.5 2" opacity="0.85" />
+  <!-- Biểu tượng Mũ Cử Nhân Vàng Kim -->
+  <polygon points="32,16 11,26 32,36 53,26" fill="url(#gold)" />
+  <path d="M20,30.5 L20,40.5 C20,44.5 25.5,47.5 32,47.5 C38.5,47.5 44,44.5 44,40.5 L44,30.5 L32,36.2 Z" fill="url(#gold)" opacity="0.92" />
+  <!-- Dây tua rua mũ cử nhân -->
+  <path d="M48,28.5 L48,41.5" stroke="url(#gold)" stroke-width="2.4" stroke-linecap="round" />
+  <circle cx="48" cy="43" r="2.3" fill="#FFF0B8" />
+</svg>

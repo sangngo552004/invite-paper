@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Studio - Chỉnh Sửa Thiệp & Quản Lý Khách Mời 🎓</title>
+  <title>Admin Studio - Thiệp Mời Tốt Nghiệp của Kim Ngân 🎓</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1173,7 +1174,7 @@ Hoàng Long"></textarea>
 
                 currentGuestList = parsedGuests.map(g => ({
                   ...g,
-                  url: `${baseUrl}?to=${encodeURIComponent(g.name)}&id=${g.id}&time=${encodeURIComponent(g.time || '08:30')}`
+                  url: `${baseUrl}?id=${g.id}`
                 }));
 
                 localStorage.setItem("invitation_authorized_guests", JSON.stringify(currentGuestList));
@@ -1384,9 +1385,9 @@ Hoàng Long"></textarea>
       if (savedListJson) {
         try {
           currentGuestList = JSON.parse(savedListJson);
-          // Tự động sửa lại mọi link cũ bị dính /admin/index.html sang đường dẫn chuẩn mới
+          // Tự động rút gọn mọi link cũ sang định dạng ngắn gọn ?id=...
           currentGuestList.forEach(item => {
-            item.url = `${baseUrl}?to=${encodeURIComponent(item.name)}&id=${item.id}&time=${encodeURIComponent(item.time || "08:30")}`;
+            item.url = `${baseUrl}?id=${item.id}`;
           });
           localStorage.setItem("invitation_authorized_guests", JSON.stringify(currentGuestList));
           if (currentGuestList.length > 0) {
@@ -1428,9 +1429,7 @@ Hoàng Long"></textarea>
 
           const idNum = maxIdNum + idx + 1;
           const id = `g${String(idNum).padStart(2, "0")}`;
-          const encodedName = encodeURIComponent(name);
-          const encodedTime = encodeURIComponent(time);
-          const url = `${baseUrl}?to=${encodedName}&id=${id}&time=${encodedTime}`;
+          const url = `${baseUrl}?id=${id}`;
 
           return { name, time, id, url };
         });

@@ -8,6 +8,9 @@ let isRemoteConfigReady = false;
 let remoteConfigPromise = null;
 let remoteSyncPromise = null;
 let guestCustomTimeOverride = null;
+let activeGuestName = "Anh / Chị / Bạn";
+let activeGuestId = "";
+let isDemoMode = false;
 
 // Khởi chạy tải dữ liệu từ Google Sheets ngay lập tức khi nạp script (trước cả DOMContentLoaded)
 // để giảm tối đa độ trễ mạng trên điện thoại di động.
@@ -36,6 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const customTime = urlParams.get("time");
 
   const isDemo = isPreview || guestId === "demo";
+  isDemoMode = isDemo;
+
+  // Rút gọn đường dẫn hiển thị trên thanh địa chỉ trình duyệt nếu có id (bỏ phần ?to=...&time=... dài dòng)
+  if (!isPreview && guestId && (rawGuestName || customTime) && window.history && window.history.replaceState) {
+    try {
+      const cleanPath = window.location.pathname.replace(/\/index\.html$/i, "/");
+      window.history.replaceState({}, "", `${cleanPath}?id=${encodeURIComponent(guestId)}`);
+    } catch (e) { }
+  }
 
   // 2. Tải cấu hình đã lưu (từ localStorage nếu có cache hoặc admin đã sửa)
   hasCachedConfig = loadLocalAdminConfig();
@@ -50,45 +62,46 @@ document.addEventListener("DOMContentLoaded", () => {
     authorizedList = CONFIG.authorizedGuests;
   }
 
-  let finalGuestName = rawGuestName ? decodeURIComponent(rawGuestName).trim() : "Anh / Chị / Bạn";
+  let finalGuestName = rawGuestName ? decodeURIComponent(rawGuestName).trim() : (guestId ? "" : "Anh / Chị / Bạn");
   const finalGuestId = guestId || "guest_" + Math.random().toString(36).substring(2, 7);
+  activeGuestId = finalGuestId;
 
   // Nếu hệ thống ĐÃ CÓ danh sách khách mời và KHÔNG phải màn hình Demo / Preview:
   if (!isDemo && authorizedList && authorizedList.length > 0) {
     const validGuest = guestId ? authorizedList.find(g => g.id === guestId) : null;
 
     if (!validGuest) {
-      // Chặn ngay lập tức: Hiện màn hình thông báo link không hợp lệ
-      const unauthScreen = document.getElementById("unauthorizedScreen");
-      const envelopeScreen = document.getElementById("envelopeScreen");
-      const mainWrapper = document.querySelector(".main-wrapper");
-
-      if (unauthScreen) unauthScreen.style.display = "flex";
-      if (envelopeScreen) envelopeScreen.style.display = "none";
-      if (mainWrapper) mainWrapper.style.display = "none";
-      return; // Dừng khởi tạo thiệp
-    }
-
-    // Dùng tên và giờ đã được lưu theo mã ID
-    finalGuestName = validGuest.name;
-    if (validGuest.time) {
-      guestCustomTimeOverride = validGuest.time;
-      CONFIG.ceremony.time = validGuest.time;
+      // Nếu chưa có trong cache local nhưng có kết nối Google Sheets, chờ kiểm tra lại khi tải xong guests_json
+      if (!CONFIG.googleSheetScriptUrl) {
+        showUnauthorizedScreen();
+        return;
+      }
+    } else {
+      // Dùng tên và giờ đã được lưu theo mã ID
+      finalGuestName = validGuest.name;
+      if (validGuest.time) {
+        guestCustomTimeOverride = validGuest.time;
+        CONFIG.ceremony.time = validGuest.time;
+      }
     }
   } else if (customTime) {
     guestCustomTimeOverride = decodeURIComponent(customTime).trim();
     CONFIG.ceremony.time = guestCustomTimeOverride;
   }
 
+  activeGuestName = finalGuestName || "Anh / Chị / Bạn";
+
   // Chỉ áp dụng ngay CONFIG nếu đã có dữ liệu thật trong bộ nhớ đệm (hoặc không dùng Google Sheet).
-  // Tránh việc trên điện thoại lần đầu mở bị nháy tên mặc định "Nguyễn Hà Minh Khánh" và ảnh mẫu.
+  // Tránh việc trên điện thoại lần đầu mở bị nháy tên mặc định và ảnh mẫu.
   if (hasCachedConfig || !CONFIG.googleSheetScriptUrl || isPreview) {
     applyConfigData(CONFIG);
     isRemoteConfigReady = true;
   }
 
   // 4. Khởi tạo giao diện
-  initGuestDetails(finalGuestName, finalGuestId);
+  if (finalGuestName) {
+    initGuestDetails(finalGuestName, finalGuestId);
+  }
   initAudioPlayer();
   initEnvelopeOpener();
   initCountdown();
@@ -293,6 +306,24 @@ async function loadRemoteConfigIfAvailable() {
           const parsedGuests = JSON.parse(remote.guests_json);
           if (Array.isArray(parsedGuests)) {
             localStorage.setItem("invitation_authorized_guests", JSON.stringify(parsedGuests));
+
+            if (!isDemoMode && parsedGuests.length > 0) {
+              const urlParams = new URLSearchParams(window.location.search);
+              const urlGuestId = urlParams.get("id");
+              const matchedGuest = urlGuestId ? parsedGuests.find(g => g.id === urlGuestId) : null;
+
+              if (!matchedGuest) {
+                showUnauthorizedScreen();
+                return;
+              }
+
+              activeGuestName = matchedGuest.name;
+              initGuestDetails(matchedGuest.name, matchedGuest.id);
+              if (matchedGuest.time) {
+                guestCustomTimeOverride = matchedGuest.time;
+                CONFIG.ceremony.time = matchedGuest.time;
+              }
+            }
           }
         } catch (e) { }
       }
@@ -347,16 +378,26 @@ function preloadPhotos(photos) {
   });
 }
 
+function showUnauthorizedScreen() {
+  const unauthScreen = document.getElementById("unauthorizedScreen");
+  const envelopeScreen = document.getElementById("envelopeScreen");
+  const mainWrapper = document.querySelector(".landing-page-container") || document.querySelector(".main-wrapper");
+
+  if (unauthScreen) unauthScreen.style.display = "flex";
+  if (envelopeScreen) envelopeScreen.style.display = "none";
+  if (mainWrapper) mainWrapper.style.display = "none";
+}
+
 /**
  * Cập nhật dữ liệu từ đối tượng CONFIG lên toàn bộ giao diện HTML
  */
 function applyConfigData(config) {
   // 1. Tên cử nhân (Chủ tiệc)
-  const fullName = config.graduate.fullName || "Nguyễn Hà Minh Khánh";
+  const fullName = config.graduate.fullName || "Nguyễn Kim Ngân";
   setElementText("graduateFullName", fullName);
   setElementText("envelopeInnerGradName", fullName);
   const nameParts = fullName.trim().split(/\s+/);
-  const shortName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : "Khánh";
+  const shortName = nameParts.length > 0 ? nameParts[nameParts.length - 1] : "Ngân";
   setElementText("graduateShortName", shortName);
   setElementText("rsvpGraduateName", shortName);
   setElementText("rsvpHostName", shortName);
@@ -1103,7 +1144,7 @@ function initRsvpHandler(guestName, guestId) {
 
   // Bấm nút "Gửi xác nhận"
   const handleSubmit = async () => {
-    const effectiveName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : guestName;
+    const effectiveName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : (activeGuestName || guestName);
     const isAttending = currentChoice === "attending";
 
     markRsvpConfirmed(currentChoice, submitBtn, statusMsg, false);
@@ -1181,7 +1222,7 @@ function initWishHandler(guestName, guestId) {
       if (CONFIG.googleSheetScriptUrl) {
         await postDataToGoogleSheets({
           action: "wish",
-          guestName: guestName,
+          guestName: activeGuestName || guestName,
           guestId: guestId,
           wish: message
         });
