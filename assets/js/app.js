@@ -60,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initEnvelopeOpener();
   initCountdown();
   initCalendarLink();
+  initCampusMapLightbox();
   initRunawayButton();
   initRsvpHandler(finalGuestName, finalGuestId);
   initWishHandler(finalGuestName, finalGuestId);
@@ -106,6 +107,7 @@ function mergeConfig(data) {
   if (data.graduate) Object.assign(CONFIG.graduate, data.graduate);
   if (data.ceremony) Object.assign(CONFIG.ceremony, data.ceremony);
   if (data.contact) Object.assign(CONFIG.contact, data.contact);
+  if (data.contacts && Array.isArray(data.contacts)) CONFIG.contacts = data.contacts;
   if (data.audio) Object.assign(CONFIG.audio, data.audio);
   if (data.photos && data.photos.length) CONFIG.photos = data.photos;
 }
@@ -211,15 +213,31 @@ async function loadRemoteConfigIfAvailable() {
       if (remote.maps_url) {
         CONFIG.ceremony.googleMapsUrl = getVal(remote.maps_url, localCfg?.ceremony?.googleMapsUrl, "");
       }
-      if (remote.contact_phone) {
-        CONFIG.contact.phone = getVal(remote.contact_phone, localCfg?.contact?.phone, "0901 234 567");
+      if (remote.campus_map_url) {
+        CONFIG.ceremony.campusMapUrl = getVal(remote.campus_map_url, localCfg?.ceremony?.campusMapUrl, "assets/images/campus-map.jpg");
       }
-      if (remote.contact_person) {
-        CONFIG.contact.personName = getVal(remote.contact_person, localCfg?.contact?.personName, "Nguyễn Văn A");
+      if (remote.campus_map_note) {
+        CONFIG.ceremony.campusMapNote = getVal(remote.campus_map_note, localCfg?.ceremony?.campusMapNote, "Vào trường xong đi đến thẳng nhà E");
       }
-      if (remote.music_url) {
-        CONFIG.audio.url = normalizeDriveUrl(remote.music_url);
+      if (remote.parking_note) {
+        CONFIG.ceremony.parkingNote = getVal(remote.parking_note, localCfg?.ceremony?.parkingNote, "Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.");
       }
+      if (remote.contacts_json) {
+        try {
+          const parsedContacts = JSON.parse(remote.contacts_json);
+          if (Array.isArray(parsedContacts) && parsedContacts.length > 0) {
+            CONFIG.contacts = parsedContacts;
+          }
+        } catch (e) { }
+      } else if (remote.contact_phone || remote.contact_person) {
+        const fallbackList = [{ name: remote.contact_person || "Nguyễn Văn A", phone: remote.contact_phone || "0901 234 567" }];
+        if (remote.contact_phone2 || remote.contact_person2) {
+          fallbackList.push({ name: remote.contact_person2 || "Người đón tại cổng", phone: remote.contact_phone2 || "0902 345 678" });
+        }
+        CONFIG.contacts = fallbackList;
+      }
+      // Audio luôn cố định từ file trong thư mục nội bộ
+      CONFIG.audio.url = "assets/audio/Cam-On-We-Belong-Together-Dong-Nhi-Trinh-Nhat-Minh.mp3";
 
       if (remote.photo_urls) {
         const remotePhotos = remote.photo_urls.split(",").map(url => normalizeDriveUrl(url.trim())).filter(Boolean);
@@ -316,27 +334,30 @@ function applyConfigData(config) {
     mapsBtn.href = config.ceremony.googleMapsUrl;
   }
 
-  // Thông tin liên hệ đón khách (Tối giản: SĐT = Zalo + Note Tên người nghe)
-  const cleanPhone = (config.contact.phone || "").replace(/[^0-9]/g, "");
-  const personName = config.contact.personName || config.graduate.fullName || "Cử nhân";
-
-  const contactNoteEl = document.getElementById("contactPersonNote");
-  if (contactNoteEl) {
-    contactNoteEl.textContent = `Liên hệ: ${personName} (${config.contact.phone || cleanPhone})`;
-  }
-
-  const phoneBtn = document.getElementById("btnContactPhone");
-  if (phoneBtn && cleanPhone) {
-    phoneBtn.href = `tel:${cleanPhone}`;
-  }
-
-  const zaloBtn = document.getElementById("btnContactZalo");
-  if (zaloBtn && cleanPhone) {
-    zaloBtn.href = `https://zalo.me/${cleanPhone}`;
-  }
+  // Danh sách người liên hệ đón khách (Dạng danh sách, không phân biệt vai trò)
+  renderFooterContacts(config.contacts || config.contact);
 
   // Khởi tạo hiển thị ảnh (1 ảnh hoặc chuyển nhẹ 2-3 ảnh)
   setupPhotoArch(config.photos);
+
+  // Sơ đồ trường & Hướng dẫn di chuyển nội bộ
+  const campusMapImg = document.getElementById("campusMapImg");
+  const campusMapModalImg = document.getElementById("campusMapModalImg");
+  const campusMapNoteText = document.getElementById("campusMapNoteText");
+  const campusMapModalNote = document.getElementById("campusMapModalNote");
+  const parkingNoteText = document.getElementById("parkingNoteText");
+  const parkingModalNote = document.getElementById("parkingModalNote");
+
+  const mapUrl = (config.ceremony && config.ceremony.campusMapUrl) ? config.ceremony.campusMapUrl : "assets/images/campus-map.jpg";
+  const mapNote = (config.ceremony && config.ceremony.campusMapNote) ? config.ceremony.campusMapNote : "Vào trường xong đi đến thẳng nhà E";
+  const parkNote = (config.ceremony && config.ceremony.parkingNote) ? config.ceremony.parkingNote : "Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.";
+
+  if (campusMapImg && mapUrl) campusMapImg.src = mapUrl;
+  if (campusMapModalImg && mapUrl) campusMapModalImg.src = mapUrl;
+  if (campusMapNoteText && mapNote) campusMapNoteText.textContent = mapNote;
+  if (campusMapModalNote && mapNote) campusMapModalNote.textContent = mapNote;
+  if (parkingNoteText && parkNote) parkingNoteText.textContent = parkNote;
+  if (parkingModalNote && parkNote) parkingModalNote.textContent = parkNote;
 
   // Cập nhật lại Calendar link & Countdown
   initCalendarLink();
@@ -346,6 +367,81 @@ function applyConfigData(config) {
 function setElementText(id, text) {
   const el = document.getElementById(id);
   if (el && text) el.textContent = text;
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+/**
+ * Hiển thị danh sách người liên hệ đón khách (Dạng danh sách, không phân biệt vai trò)
+ */
+function renderFooterContacts(contactsData) {
+  const container = document.getElementById("footerContactsList");
+  if (!container) return;
+
+  let list = [];
+  if (Array.isArray(contactsData) && contactsData.length > 0) {
+    list = contactsData;
+  } else if (CONFIG.contacts && Array.isArray(CONFIG.contacts) && CONFIG.contacts.length > 0) {
+    list = CONFIG.contacts;
+  } else if (contactsData && typeof contactsData === "object") {
+    if (contactsData.phone || contactsData.personName) {
+      list.push({ name: contactsData.personName || "Người liên hệ", phone: contactsData.phone });
+    }
+    if (contactsData.phone2 || contactsData.personName2) {
+      list.push({ name: contactsData.personName2 || "Người liên hệ", phone: contactsData.phone2 });
+    }
+  }
+
+  if (!list.length) {
+    list = [{ name: "Nguyễn Văn A", phone: "0901 234 567" }];
+  }
+
+  container.innerHTML = "";
+  list.forEach(c => {
+    const name = (c.name || c.personName || "").trim() || "Người liên hệ";
+    const phone = (c.phone || "").trim();
+    const cleanPhone = phone.replace(/[^0-9]/g, "");
+
+    const row = document.createElement("div");
+    row.className = "contact-list-item";
+
+    let actionsHtml = "";
+    if (cleanPhone) {
+      actionsHtml = `
+        <div class="contact-list-actions">
+          <a href="tel:${cleanPhone}" class="contact-pill" title="Gọi cho ${escapeHtml(name)}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span>Gọi</span>
+          </a>
+          <a href="https://zalo.me/${cleanPhone}" target="_blank" rel="noopener noreferrer" class="contact-pill" title="Nhắn Zalo cho ${escapeHtml(name)}">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.02L5 22l4.3-1.43C10.16 20.8 11.06 21 12 21c5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
+            </svg>
+            <span>Zalo</span>
+          </a>
+        </div>
+      `;
+    }
+
+    row.innerHTML = `
+      <div class="contact-list-info">
+        <div class="contact-list-name">${escapeHtml(name)}</div>
+        <div class="contact-list-phone">${escapeHtml(phone)}</div>
+      </div>
+      ${actionsHtml}
+    `;
+    container.appendChild(row);
+  });
 }
 
 /**
@@ -583,6 +679,47 @@ function initCalendarLink() {
   } catch (e) {
     console.error("Lỗi tạo calendar link:", e);
   }
+}
+
+/**
+ * Quản lý mở / đóng Modal phóng to Sơ đồ di chuyển trong trường
+ */
+function initCampusMapLightbox() {
+  const trigger = document.getElementById("campusMapTrigger");
+  const modal = document.getElementById("campusMapModal");
+  const closeBtn = document.getElementById("btnCloseCampusMap");
+  const backdrop = document.getElementById("campusMapModalBackdrop");
+
+  if (!trigger || !modal) return;
+
+  function openModal() {
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  trigger.addEventListener("click", openModal);
+  trigger.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openModal();
+    }
+  });
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
+  if (backdrop) backdrop.addEventListener("click", closeModal);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("active")) {
+      closeModal();
+    }
+  });
 }
 
 /**

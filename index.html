@@ -218,6 +218,47 @@
           </a>
         </div>
 
+        <!-- Sơ đồ trường & Hướng dẫn di chuyển nội bộ -->
+        <div id="campusMapCard" class="campus-map-card">
+          <div class="campus-map-header">
+            <span class="campus-map-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                <line x1="8" y1="2" x2="8" y2="18"></line>
+                <line x1="16" y1="6" x2="16" y2="22"></line>
+              </svg>
+              Sơ đồ trong trường
+            </span>
+            <span class="campus-map-subtitle">Chạm vào ảnh để phóng to</span>
+          </div>
+
+          <!-- Khung ảnh sơ đồ thu nhỏ có hiệu ứng zoom -->
+          <div class="campus-map-preview-wrap" id="campusMapTrigger" role="button" tabindex="0" title="Chạm để phóng to xem sơ đồ chi tiết">
+            <img id="campusMapImg" src="assets/images/campus-map.jpg" alt="Sơ đồ di chuyển trong trường" loading="lazy">
+            <div class="campus-map-zoom-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+                <line x1="8" y1="11" x2="14" y2="11"></line>
+              </svg>
+              <span>Phóng to</span>
+            </div>
+          </div>
+
+          <!-- Ghi chú chỉ dẫn lối đi & gửi xe -->
+          <div class="campus-map-note-box">
+            <div class="campus-map-note-item">
+              <span class="campus-map-note-label">Lối đi:</span>
+              <span id="campusMapNoteText" class="campus-map-note-text">Vào trường xong đi đến thẳng nhà E</span>
+            </div>
+            <div class="campus-map-note-item">
+              <span class="campus-map-note-label">Gửi xe:</span>
+              <span id="parkingNoteText" class="campus-map-note-text">Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.</span>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <!-- ==========================================================================
@@ -300,27 +341,8 @@
       <footer class="card-footer">
         <div class="footer-hotline-title">Thông tin liên hệ đón khách khi tới cổng</div>
         
-        <div class="footer-contact-box">
-          <div id="contactPersonNote" class="contact-name-note">
-            Liên hệ: Nguyễn Văn A (0901 234 567)
-          </div>
-          <div class="footer-contact-actions">
-            <!-- Nút gọi điện thoại trực tiếp -->
-            <a id="btnContactPhone" href="tel:0901234567" class="contact-pill">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-              </svg>
-              <span>Gọi điện</span>
-            </a>
-
-            <!-- Nút mở Zalo trực tiếp bằng chính SĐT đó -->
-            <a id="btnContactZalo" href="https://zalo.me/0901234567" target="_blank" rel="noopener noreferrer" class="contact-pill">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.02L5 22l4.3-1.43C10.16 20.8 11.06 21 12 21c5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
-              </svg>
-              <span>Nhắn Zalo</span>
-            </a>
-          </div>
+        <div class="footer-contacts-list" id="footerContactsList">
+          <!-- Danh sách người liên hệ đón khách (Tự động tạo động từ cấu hình) -->
         </div>
 
         <div class="closing-message font-script">
@@ -334,6 +356,43 @@
 
     </article>
   </main>
+
+  <!-- ==========================================================================
+       MODAL PHÓNG TO SƠ ĐỒ TRƯỜNG (CAMPUS MAP LIGHTBOX)
+       ========================================================================== -->
+  <div id="campusMapModal" class="campus-map-modal" aria-hidden="true">
+    <div class="campus-map-modal-backdrop" id="campusMapModalBackdrop"></div>
+    <div class="campus-map-modal-card">
+      <div class="campus-map-modal-header">
+        <div class="campus-map-modal-title font-serif">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          <span>Sơ Đồ Trong Trường</span>
+        </div>
+        <button id="btnCloseCampusMap" type="button" class="campus-map-modal-close" aria-label="Đóng">&times;</button>
+      </div>
+
+      <div class="campus-map-modal-body">
+        <img id="campusMapModalImg" src="assets/images/campus-map.jpg" alt="Sơ đồ di chuyển trong trường">
+      </div>
+
+      <div class="campus-map-modal-footer">
+        <div class="campus-map-modal-note-list">
+          <div class="modal-note-item">
+            <span class="modal-note-label">Lối đi:</span>
+            <span id="campusMapModalNote">Vào trường xong đi đến thẳng nhà E</span>
+          </div>
+          <div class="modal-note-item">
+            <span class="modal-note-label">Gửi xe:</span>
+            <span id="parkingModalNote">Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ==========================================================================
        MEME POPUP (Khi khách bấm trúng nút né tránh troll)

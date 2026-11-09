@@ -707,6 +707,268 @@ body {
 }
 
 /* ==========================================================================
+   CAMPUS MAP CARD (Sơ đồ trường & Hướng dẫn di chuyển nội bộ)
+   ========================================================================== */
+.campus-map-card {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-soft);
+  text-align: left;
+}
+
+.campus-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.campus-map-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-sage-tint);
+  color: var(--primary-sage);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.campus-map-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.campus-map-preview-wrap {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid var(--border-soft);
+  background: #FAFBF9;
+  box-shadow: 0 4px 14px rgba(85, 122, 102, 0.08);
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.campus-map-preview-wrap:hover,
+.campus-map-preview-wrap:focus-visible {
+  border-color: var(--primary-sage-soft);
+  box-shadow: 0 8px 22px rgba(85, 122, 102, 0.16);
+}
+
+.campus-map-preview-wrap img {
+  width: 100%;
+  max-height: 210px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.campus-map-preview-wrap:hover img {
+  transform: scale(1.03);
+}
+
+.campus-map-zoom-pill {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  color: var(--primary-sage);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  border: 1px solid rgba(85, 122, 102, 0.15);
+}
+
+.campus-map-note-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--bg-sage-tint);
+  border-radius: 12px;
+  border-left: 3px solid var(--primary-sage);
+  text-align: left;
+}
+
+.campus-map-note-item {
+  font-size: 0.86rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.campus-map-note-item + .campus-map-note-item {
+  padding-top: 8px;
+  border-top: 1px dashed rgba(85, 122, 102, 0.22);
+}
+
+.campus-map-note-label {
+  font-weight: 700;
+  color: var(--primary-sage);
+  margin-right: 4px;
+}
+
+.campus-map-note-text {
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   CAMPUS MAP LIGHTBOX MODAL
+   ========================================================================== */
+.campus-map-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.campus-map-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.campus-map-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 32, 26, 0.72);
+  backdrop-filter: blur(5px);
+}
+
+.campus-map-modal-card {
+  position: relative;
+  z-index: 1;
+  background: #FFFFFF;
+  border-radius: 20px;
+  max-width: 680px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  transform: scale(0.92);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.campus-map-modal.active .campus-map-modal-card {
+  transform: scale(1);
+}
+
+.campus-map-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--bg-sage-tint);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.campus-map-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--primary-sage);
+  font-size: 1.05rem;
+}
+
+.campus-map-modal-close {
+  background: #FFFFFF;
+  border: 1px solid var(--border-soft);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.campus-map-modal-close:hover {
+  background: var(--primary-sage);
+  color: #FFFFFF;
+  border-color: var(--primary-sage);
+}
+
+.campus-map-modal-body {
+  overflow-y: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  background: #FAFBF9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: calc(90vh - 120px);
+}
+
+.campus-map-modal-body img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+  display: block;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.campus-map-modal-footer {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 18px;
+  background: #FFFFFF;
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.campus-map-modal-note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-note-item {
+  line-height: 1.45;
+}
+
+.modal-note-item + .modal-note-item {
+  padding-top: 6px;
+  border-top: 1px dashed rgba(85, 122, 102, 0.18);
+}
+
+.modal-note-label {
+  font-weight: 700;
+  color: var(--primary-sage);
+  margin-right: 4px;
+}
+
+/* ==========================================================================
    STANDALONE RSVP SECTION
    ========================================================================== */
 .rsvp-section {
@@ -1002,6 +1264,69 @@ body {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--text-muted);
+}
+
+/* ==========================================================================
+   DANH SÁCH NGƯỜI LIÊN HỆ ĐÓN KHÁCH (LIST VIEW)
+   ========================================================================== */
+.footer-contacts-list {
+  background: #FFFFFF;
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  margin: 14px 0 22px 0;
+  box-shadow: 0 4px 14px rgba(85, 122, 102, 0.05);
+  overflow: hidden;
+  text-align: left;
+}
+
+.contact-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  gap: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.contact-list-item:hover {
+  background-color: rgba(235, 242, 237, 0.45);
+}
+
+.contact-list-item + .contact-list-item {
+  border-top: 1px solid var(--border-soft);
+}
+
+.contact-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.contact-list-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--primary-sage);
+  line-height: 1.3;
+}
+
+.contact-list-phone {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.contact-list-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.contact-list-actions .contact-pill {
+  padding: 6px 13px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  gap: 5px;
 }
 
 .footer-contact-box {

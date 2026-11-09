@@ -309,6 +309,15 @@
       align-items: center;
     }
 
+    /* Contact Slots */
+    .contact-slot-card {
+      background: #F7FAF8;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
     .photo-thumb-preview {
       width: 58px;
       height: 72px;
@@ -556,46 +565,26 @@
             </button>
           </div>
 
-          <!-- 4. Thông Tin Liên Hệ Đón Khách -->
+          <!-- 4. Danh Sách Người Liên Hệ Đón Khách (Động) -->
           <div class="card">
             <div class="card-header-flex">
               <div class="card-title">
-                <span>📞 Liên Hệ Đón Khách (SĐT / Zalo)</span>
+                <span>📞 Người Liên Hệ Đón Khách (<span id="contactCountBadge">2</span>)</span>
               </div>
               <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
             </div>
 
-            <div class="grid-2">
-              <div class="form-group">
-                <label for="editContactPhone">Số điện thoại (đồng thời là Zalo)</label>
-                <input type="tel" id="editContactPhone" placeholder="0901 234 567">
-              </div>
+            <p class="hint-text" style="margin-bottom: 12px;">
+              💡 <strong>Thêm bao nhiêu người liên hệ tùy thích:</strong> Hiển thị dưới dạng danh sách tên và số điện thoại trên thiệp để khách tiện gọi hoặc nhắn Zalo khi đến cổng.
+            </p>
 
-              <div class="form-group">
-                <label for="editContactPerson">Tên người đón tiếp</label>
-                <input type="text" id="editContactPerson" placeholder="Nguyễn Văn A">
-              </div>
-            </div>
-          </div>
+            <!-- Danh sách các người liên hệ động -->
+            <div id="contactSlotsContainer"></div>
 
-          <!-- 5. Nhạc Nền -->
-          <div class="card">
-            <div class="card-header-flex">
-              <div class="card-title">
-                <span>🎵 Nhạc Nền (Audio)</span>
-              </div>
-              <button class="btn btn-save-mini btn-save-trigger">💾 Lưu</button>
-            </div>
-
-            <div class="form-group">
-              <label for="editAudioUrl">Link bài hát (Link MP3 hoặc link Google Drive)</label>
-              <input type="text" id="editAudioUrl" placeholder="assets/audio/nhac.mp3 hoặc link Google Drive...">
-              <div class="hint-text">Hỗ trợ dán link Google Drive chia sẻ công khai.</div>
-            </div>
-
-            <div class="form-group">
-              <audio id="adminAudioPreview" controls style="width: 100%; height: 38px; margin-top: 6px;"></audio>
-            </div>
+            <button type="button" id="btnAddContactSlot" class="btn btn-secondary btn-sm"
+              style="margin-top: 6px; width: 100%;">
+              ➕ Thêm Người Liên Hệ Mới
+            </button>
           </div>
 
         </div>
@@ -731,6 +720,16 @@ Hoàng Long"></textarea>
     let currentGuestList = [];
     let renderGuestsTableGlobal = null;
 
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       // 1. Chuyển Tab Navigation
       const tabBtns = document.querySelectorAll(".nav-tab-btn");
@@ -771,6 +770,14 @@ Hoàng Long"></textarea>
       if (btnAddPhotoSlot) {
         btnAddPhotoSlot.addEventListener("click", () => {
           addSinglePhotoSlot("");
+        });
+      }
+
+      // 7b. Nút thêm người liên hệ đón khách mới (thêm bao nhiêu tùy thích)
+      const btnAddContactSlot = document.getElementById("btnAddContactSlot");
+      if (btnAddContactSlot) {
+        btnAddContactSlot.addEventListener("click", () => {
+          addSingleContactSlot("", "");
         });
       }
 
@@ -882,25 +889,102 @@ Hoàng Long"></textarea>
         }
       });
 
-      document.getElementById("editContactPhone").value = cfg.contact.phone || "";
-      document.getElementById("editContactPerson").value = cfg.contact.personName || "";
+      // Load danh sách người liên hệ đón khách động (Thêm tùy thích)
+      let contacts = (cfg.contacts && cfg.contacts.length) ? cfg.contacts : [];
+      if (!contacts.length && cfg.contact) {
+        if (cfg.contact.phone || cfg.contact.personName) {
+          contacts.push({ name: cfg.contact.personName || "Nguyễn Văn A", phone: cfg.contact.phone || "0901 234 567" });
+        }
+        if (cfg.contact.phone2 || cfg.contact.personName2) {
+          contacts.push({ name: cfg.contact.personName2 || "Người đón tại cổng", phone: cfg.contact.phone2 || "0902 345 678" });
+        }
+      }
+      if (!contacts.length) {
+        contacts = CONFIG.contacts || [
+          { name: "Nguyễn Văn A", phone: "0901 234 567" },
+          { name: "Người đón tại cổng", phone: "0902 345 678" }
+        ];
+      }
+      renderDynamicContactSlots(contacts);
 
-      // Load danh sách ảnh động (Mặc định 3 ảnh nếu chưa có cấu hình)
+      // Load danh sách ảnh động (Mặc định ảnh nếu chưa có cấu hình)
       const photos = (cfg.photos && cfg.photos.length) ? cfg.photos : CONFIG.photos;
       renderDynamicPhotoSlots(photos);
+    }
 
-      const audioUrlInput = document.getElementById("editAudioUrl");
-      const audioPreview = document.getElementById("adminAudioPreview");
-      if (cfg.audio && cfg.audio.url) {
-        audioUrlInput.value = cfg.audio.url;
-        audioPreview.src = normalizeDriveUrl(cfg.audio.url);
+    function renderDynamicContactSlots(contactsList) {
+      const container = document.getElementById("contactSlotsContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      contactsList.forEach((c, idx) => {
+        addSingleContactSlot(c.name || "", c.phone || "", idx + 1);
+      });
+      updateContactCountBadge();
+    }
+
+    function addSingleContactSlot(name = "", phone = "", slotNumber) {
+      const container = document.getElementById("contactSlotsContainer");
+      if (!container) return;
+
+      const num = slotNumber || (container.children.length + 1);
+      const slotCard = document.createElement("div");
+      slotCard.className = "contact-slot-card";
+
+      slotCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span class="contact-slot-label" style="font-weight:700; font-size:0.86rem; color:var(--primary);">Người liên hệ #${num}</span>
+          ${num > 1 ? '<button type="button" class="btn btn-danger btn-sm btn-delete-contact" title="Xóa người này" style="padding:2px 8px; font-size:0.75rem;">🗑️ Xóa</button>' : ''}
+        </div>
+        <div class="grid-2">
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.78rem;">Tên người đón</label>
+            <input type="text" class="contact-name-input" value="${escapeHtml(name)}" placeholder="Tên người đón tiếp">
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-size:0.78rem;">Số điện thoại (Zalo)</label>
+            <input type="tel" class="contact-phone-input" value="${escapeHtml(phone)}" placeholder="0901 234 567">
+          </div>
+        </div>
+      `;
+
+      const nameInput = slotCard.querySelector(".contact-name-input");
+      const phoneInput = slotCard.querySelector(".contact-phone-input");
+      const deleteBtn = slotCard.querySelector(".btn-delete-contact");
+
+      nameInput.addEventListener("input", broadcastConfigToPreview);
+      phoneInput.addEventListener("input", broadcastConfigToPreview);
+
+      if (deleteBtn) {
+        deleteBtn.addEventListener("click", () => {
+          slotCard.remove();
+          reindexContactSlots();
+          broadcastConfigToPreview();
+        });
       }
 
-      audioUrlInput.addEventListener("input", () => {
-        if (audioUrlInput.value.trim()) {
-          audioPreview.src = normalizeDriveUrl(audioUrlInput.value.trim());
-        }
+      container.appendChild(slotCard);
+      updateContactCountBadge();
+    }
+
+    function reindexContactSlots() {
+      const container = document.getElementById("contactSlotsContainer");
+      if (!container) return;
+      const cards = container.querySelectorAll(".contact-slot-card");
+      cards.forEach((card, idx) => {
+        const num = idx + 1;
+        const label = card.querySelector(".contact-slot-label");
+        if (label) label.textContent = `Người liên hệ #${num}`;
       });
+      updateContactCountBadge();
+    }
+
+    function updateContactCountBadge() {
+      const container = document.getElementById("contactSlotsContainer");
+      const badge = document.getElementById("contactCountBadge");
+      if (container && badge) {
+        badge.textContent = container.children.length;
+      }
     }
 
     function renderDynamicPhotoSlots(photosList) {
@@ -989,6 +1073,13 @@ Hoàng Long"></textarea>
       const photoInputs = document.querySelectorAll(".photo-url-input");
       const photos = Array.from(photoInputs).map(inp => inp.value.trim()).filter(Boolean);
 
+      const contactCards = document.querySelectorAll(".contact-slot-card");
+      const contacts = Array.from(contactCards).map(card => {
+        const name = card.querySelector(".contact-name-input")?.value.trim() || "";
+        const phone = card.querySelector(".contact-phone-input")?.value.trim() || "";
+        return { name, phone };
+      }).filter(c => c.name || c.phone);
+
       return {
         googleSheetScriptUrl: CONFIG.googleSheetScriptUrl || "",
         graduate: {
@@ -1002,18 +1093,20 @@ Hoàng Long"></textarea>
           dateFormatted: formatDisplayDate(document.getElementById("editDateFormatted").value.trim() || document.getElementById("editCeremonyDate").value),
           venueName: document.getElementById("editVenueName").value.trim(),
           address: document.getElementById("editAddress").value.trim(),
-          googleMapsUrl: document.getElementById("editMapsUrl").value.trim()
+          googleMapsUrl: document.getElementById("editMapsUrl").value.trim(),
+          campusMapUrl: CONFIG.ceremony?.campusMapUrl || "assets/images/campus-map.jpg",
+          campusMapNote: CONFIG.ceremony?.campusMapNote || "Vào trường xong đi đến thẳng nhà E",
+          parkingNote: CONFIG.ceremony?.parkingNote || "Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường."
         },
         photos: photos.length ? photos : [
           "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000"
         ],
-        contact: {
-          phone: document.getElementById("editContactPhone").value.trim(),
-          personName: document.getElementById("editContactPerson").value.trim()
-        },
+        contacts: contacts.length ? contacts : (CONFIG.contacts || [
+          { name: "Nguyễn Văn A", phone: "0901 234 567" }
+        ]),
         audio: {
           enabled: true,
-          url: document.getElementById("editAudioUrl").value.trim() || CONFIG.audio.url,
+          url: "assets/audio/Cam-On-We-Belong-Together-Dong-Nhi-Trinh-Nhat-Minh.mp3",
           autoPlayOnOpen: true
         }
       };
@@ -1040,12 +1133,21 @@ Hoàng Long"></textarea>
           if (remote.venue_name) document.getElementById("editVenueName").value = remote.venue_name;
           if (remote.address) document.getElementById("editAddress").value = remote.address;
           if (remote.maps_url) document.getElementById("editMapsUrl").value = remote.maps_url;
-          if (remote.contact_phone) document.getElementById("editContactPhone").value = remote.contact_phone;
-          if (remote.contact_person) document.getElementById("editContactPerson").value = remote.contact_person;
-          if (remote.music_url) {
-            document.getElementById("editAudioUrl").value = remote.music_url;
-            const audioPreview = document.getElementById("adminAudioPreview");
-            if (audioPreview) audioPreview.src = normalizeDriveUrl(remote.music_url);
+
+          // Đồng bộ danh sách người liên hệ đón khách
+          if (remote.contacts_json) {
+            try {
+              const remoteContacts = JSON.parse(remote.contacts_json);
+              if (Array.isArray(remoteContacts) && remoteContacts.length > 0) {
+                renderDynamicContactSlots(remoteContacts);
+              }
+            } catch(e) {}
+          } else if (remote.contact_phone || remote.contact_person) {
+            const list = [{ name: remote.contact_person || "Nguyễn Văn A", phone: remote.contact_phone || "0901 234 567" }];
+            if (remote.contact_phone2 || remote.contact_person2) {
+              list.push({ name: remote.contact_person2 || "Người đón tại cổng", phone: remote.contact_phone2 || "0902 345 678" });
+            }
+            renderDynamicContactSlots(list);
           }
 
           // XỬ LÝ ẢNH CHÍNH XÁC: Hiển thị đúng số lượng ảnh trên Google Sheet (kể cả 1 ảnh)
@@ -1204,8 +1306,14 @@ Hoàng Long"></textarea>
         venue_name: newCfg.ceremony.venueName,
         address: newCfg.ceremony.address,
         maps_url: newCfg.ceremony.googleMapsUrl,
-        contact_phone: newCfg.contact.phone,
-        contact_person: newCfg.contact.personName,
+        campus_map_url: newCfg.ceremony.campusMapUrl || "",
+        campus_map_note: newCfg.ceremony.campusMapNote || "",
+        parking_note: newCfg.ceremony.parkingNote || "",
+        contacts_json: JSON.stringify(newCfg.contacts || []),
+        contact_phone: newCfg.contacts?.[0]?.phone || "",
+        contact_person: newCfg.contacts?.[0]?.name || "",
+        contact_phone2: newCfg.contacts?.[1]?.phone || "",
+        contact_person2: newCfg.contacts?.[1]?.name || "",
         music_url: newCfg.audio.url,
         photo_urls: newCfg.photos.join(","),
         guests_json: JSON.stringify(currentGuestList || [])

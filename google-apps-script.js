@@ -179,10 +179,16 @@ function setupInitialSheets(ss) {
       ["venue_name", "Hội trường A5, Đại học Bách Khoa TP.HCM", "Tên hội trường/Địa điểm"],
       ["address", "268 Lý Thường Kiệt, Phường 14, Quận 10, TP.HCM", "Địa chỉ chi tiết"],
       ["maps_url", "https://maps.google.com/?q=268+Lý+Thường+Kiệt+Phường+14+Quận+10+Hồ+Chí+Minh", "Link Google Maps"],
+      ["campus_map_url", "assets/images/campus-map.jpg", "Link ảnh sơ đồ trong trường"],
+      ["campus_map_note", "Vào trường xong đi đến thẳng nhà E", "Ghi chú hướng dẫn di chuyển trong trường"],
+      ["parking_note", "Gửi trong trường chuẩn bị trước 4k (trường thu tiền gửi xe trước). Nếu trường hết chỗ để xe thì có thể gửi xe đối diện trường.", "Ghi chú gửi xe"],
       ["photo_urls", "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1000", "Link ảnh cử nhân"],
-      ["contact_phone", "0901 234 567", "Số điện thoại liên hệ (đồng thời là Zalo)"],
-      ["contact_person", "Nguyễn Văn A", "Tên người liên hệ nghe máy đón tiếp"],
-      ["music_url", "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=graduation-day-piano-112190.mp3", "Link bài hát"]
+      ["contact_phone", "0901 234 567", "Số điện thoại liên hệ 1"],
+      ["contact_person", "Nguyễn Văn A", "Tên người liên hệ 1"],
+      ["contact_phone2", "0902 345 678", "Số điện thoại liên hệ 2"],
+      ["contact_person2", "Người đón tại cổng", "Tên người liên hệ 2"],
+      ["contacts_json", "[{\"name\":\"Nguyễn Văn A\",\"phone\":\"0901 234 567\"},{\"name\":\"Người đón tại cổng\",\"phone\":\"0902 345 678\"}]", "Danh sách người liên hệ đón khách (JSON)"],
+      ["music_url", "assets/audio/Cam-On-We-Belong-Together-Dong-Nhi-Trinh-Nhat-Minh.mp3", "Link bài hát"]
     ];
     configSheet.getRange(1, 1, defaultConfigs.length, 3).setValues(defaultConfigs);
     configSheet.getRange(1, 1, 1, 3).setFontWeight("bold").setBackground("#DFEAE3");
